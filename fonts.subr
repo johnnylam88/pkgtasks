@@ -1,0 +1,296 @@
+# $NetBSD$
+#
+# Copyright (c) 2017 The NetBSD Foundation, Inc.
+# All rights reserved.
+#
+# This code is derived from software contributed to The NetBSD Foundation
+# by Johnny C. Lam.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# NAME
+#	fonts.subr -- X11 font directory management for packages
+#
+# SYNOPSIS
+#	task_fonts add | remove
+#
+# DESCRIPTION
+#	The task_fonts function supports two actions: "add" and "remove".
+#	The function reads standard input line by line and looks for
+#	lines of the form:
+#
+#	    # FONTS: <fontdir> <fonttype>
+#
+#	If any of the fontdir path is relative, then it is assumed to be
+#	relative to ${PKG_PREFIX}.
+#
+#	Both the "add" and "remove" actions regenerate the index files
+#	for X11 fonts directories.
+#
+# RETURN VALUES
+#	Returns 0 if reindexing is successful for all font directories,
+#	and >0 if an error occurs.
+#
+# ENVIRONMENT
+#	The following variables are used if they are set:
+#
+#	MKFONTDIR
+#		The name or path to the mkfontdir(1) utility.
+#
+#	MKFONTSCALE
+#		The name or path to the mkfontscale(1) utility.
+#
+#	PKGNAME
+#		The name of the package.
+#
+#	PKG_DESTDIR
+#		A "destdir" prefix that is prepended to all filesystem
+#		paths.  The default value is the empty string.
+#
+#	PKG_PREFIX
+#		The installation prefix of the package.  The default is
+#		"/usr/pkg".
+#
+#	PKG_UPDATE_FONTS_DB
+#		If ${PKG_UPDATE_FONTS_DB} is a "truthy" value, then the
+#		"add" and "remove" actions are allowed to update the font
+#		indices files.
+#
+#	RM	The name or path to the rm(1) utility.
+#
+#	RMDIR	The name or path to the rmdir(1) utility.
+#
+#	TTMKFDIR
+#		The name or path to the ttmkfdir(1) utility.
+#
+
+__task_fonts__="yes"
+__task_fonts_init__="_task_fonts_init"
+
+task_load cleanup
+task_load echo
+task_load dirwalk
+task_load quote
+task_load truthy
+
+task_fonts()
+{
+	: ${PKG_PREFIX:=/usr/pkg}
+	: ${PKGNAME:=${0##*/}}
+
+	: ${PKG_UPDATE_FONTS_DB:=yes}
+
+	local action="$1"; shift
+	case $action in
+	add|remove)
+		task_echo -bc "  > ${PKGNAME}: font indices"
+		: "valid actions" ;;
+	*)	return 0 ;;
+	esac
+
+	# Skip actions if ${PKG_UPDATE_FONTS_DB} isn't truthy.
+	local update_fonts="yes"
+	task_is_truthy "${PKG_UPDATE_FONTS_DB}" || update_fonts=
+
+	# Guard against ${PKG_PREFIX} == "/".
+	local prefix
+	case ${PKG_PREFIX}/ in
+	//)	prefix= ;;
+	*)	prefix=${PKG_PREFIX} ;;
+	esac
+
+	local result line_result
+	local quoted
+
+	result=0
+	local hash tag fontdir fonttype
+	while read hash tag fontdir fonttype; do
+		# Filter for "# FONTS:".
+		case $hash/$tag in
+		"#/FONTS:")
+			: "use this line" ;;
+		*)	continue ;;
+		esac
+		case $fonttype in
+		"")	# skip lines without required args
+			continue ;;
+		esac
+		# Canonicalize paths.
+		case $fontdir in
+		"")	# skip lines without required args
+			continue ;;
+		[!/]*)	fontdir="$prefix/$fontdir" ;;
+		esac
+		fontdir="${PKG_DESTDIR}$fontdir"
+
+		if [ ! -d "$fontdir" ]; then
+			task_echo "    ! fonts directory missing: $fontdir"
+			result=1
+			continue
+		fi
+
+		task_quote "$fontdir"
+		__task_fonts_dirs__="$__task_fonts_dirs__ $quoted"
+
+		line_result=0
+
+		# Generate font index for the directory.
+		if [ -n "$update_fonts" ]; then
+			case $fonttype in
+			[Tt][Tt][Ff])
+				_task_fonts_index_ttf "$fontdir" || line_result=1 ;;
+			[Tt][Yy][Pp][Ee]1)
+		  		_task_fonts_index_type1 "$fontdir" || line_result=1 ;;
+			[Xx]11)
+				_task_fonts_index_x11 "$fontdir" || line_result=1 ;;
+			esac
+		fi
+		if [ -n "$update_fonts" -a $line_result -eq 0 ]; then
+			task_echo "    > fonts index rebuilt: $fontdir"
+		else
+			task_echo "    ! fonts index not rebuilt: $fontdir"
+		fi
+
+		[ $line_result -eq 0 ] || result=1
+	done
+
+	_task_fonts_cleanup
+	return $result
+}
+
+_task_fonts_index_ttf()
+{
+	: ${MKFONTSCALE:=mkfontscale}
+	: ${TTMKFDIR:=ttmkfdir}
+
+	# Guard against ${PKG_PREFIX} == "/".
+	local prefix
+	case ${PKG_PREFIX}/ in
+	//)	prefix= ;;
+	*)	prefix=${PKG_PREFIX} ;;
+	esac
+
+	local fontdir="$1"; shift
+	case $fontdir in
+	$prefix/*)
+		# Assume font directories under ${PKG_PREFIX} are indexed
+		# with mkfontscale.
+		#
+		( cd "$fontdir" && ${MKFONTSCALE} >/dev/null 2>&1 ) || return 1
+		;;
+	*)	( cd "$fontdir" && ${TTMKFDIR} >/dev/null 2>&1 ) || return 1
+		;;
+	esac
+	return 0
+}
+
+_task_fonts_index_type1()
+{
+	: ${MKFONTSCALE:=mkfontscale}
+	: ${RM:=rm}
+	: ${TYPE1INST:=type1inst}
+
+	# Guard against ${PKG_PREFIX} == "/".
+	local prefix
+	case ${PKG_PREFIX}/ in
+	//)	prefix= ;;
+	*)	prefix=${PKG_PREFIX} ;;
+	esac
+
+	local fontdir="$1"; shift
+	case $fontdir in
+	$prefix/*)
+		# Assume font directories under ${PKG_PREFIX} are indexed
+		# with mkfontscale.
+		#
+		( cd "$fontdir" && ${MKFONTSCALE} >/dev/null 2>&1 ) || return 1
+		;;
+	*)	( local result=0
+		  cd "$fontdir" && ${TYPE1INST} >/dev/null 2>&1 || result=1
+		  ${RM} -f type1inst.log
+		  return $result
+		) || return 1
+		;;
+	esac
+	return 0
+}
+
+_task_fonts_index_x11()
+{
+	: ${MKFONTDIR:=mkfontdir}
+
+	local fontdir="$1"; shift
+	if [ -z "${X11_ENCODINGSDIR}" ]; then
+		( cd "$fontdir" && ${MKFONTDIR} >/dev/null 2>&1 ) || return 1
+	else
+		( cd "$fontdir" &&
+		  ${MKFONTDIR} -e "${PKG_DESTDIR}${X11_ENCODINGSDIR}" >/dev/null 2>&1
+		) || return 1
+	fi
+	return 0
+}
+
+_task_fonts_cleanup()
+{
+	: ${RM:=rm}
+	: ${RMDIR:=rmdir}
+	
+	eval set -- $__task_fonts_dirs__
+	local fontdir
+	for fontdir; do
+		[ -d "$fontdir" ] || continue
+		# Remove log file from Type1 font scaling.
+		[ ! -f "$fontdir/type1inst.log" ] ||
+			${RM} -f "$fontdir/type1inst.log"
+		# Remove directories that have no font files remaining.
+		task_dirwalk -f "$fontdir" |
+		while IFS= read fontfile; do
+			case $fontfile in
+			*/encodings.dir|*/fonts.dir|*/fonts.scale|*/Fontmap*)
+				: "skip index files" ;;
+			*)	# font found
+				return 0 ;;
+			esac
+			# no fonts found
+			return 1
+		done
+		if [ $? -gt 0 ]; then
+			${RM} -f \
+				"$fontdir/encodings.dir" \
+				"$fontdir/fonts.dir" \
+				"$fontdir/fonts.scale" \
+				"$fontdir/Fontmap"*
+			${RMDIR} -p "$fontdir" 2>/dev/null
+		fi
+	done
+	__task_fonts_dirs__=
+}
+
+_task_fonts_init()
+{
+	task_cleanup_add_hook _task_fonts_cleanup
+}
+
+# Static variable for directories that should be pruned if they are empty
+# if an error occors.
+#
+__task_fonts_dirs__=

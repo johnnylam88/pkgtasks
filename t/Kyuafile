@@ -1,0 +1,52 @@
+-- $NetBSD$
+
+--[[-----------------------------------------------------------------------
+
+	The following variables will be used if they are set.
+
+	TASK_MODULE_DIR
+		The location where the task modules are found.
+
+	TASK_TESTS_DIR
+		The location where this Kyuafile is found.
+
+--]]-----------------------------------------------------------------------
+
+syntax( 2 )
+
+test_suite( "pkgtask" )
+
+tap_test_program { name = "t_compare" }
+tap_test_program { name = "t_createfile" }
+tap_test_program { name = "t_directories" }
+tap_test_program { name = "t_dirwalk" }
+tap_test_program { name = "t_echo" }
+tap_test_program { name = "t_files" }
+tap_test_program { name = "t_fonts" }
+tap_test_program { name = "t_groups" }
+tap_test_program { name = "t_info_files" }
+tap_test_program { name = "t_lock" }
+tap_test_program { name = "t_makedir" }
+tap_test_program { name = "t_maketemp" }
+tap_test_program { name = "t_match" }
+tap_test_program { name = "t_ocaml_findlib" }
+tap_test_program { name = "t_permissions" }
+tap_test_program { name = "t_postinstall" }
+tap_test_program { name = "t_postremove" }
+tap_test_program { name = "t_preinstall" }
+tap_test_program { name = "t_preremove" }
+tap_test_program { name = "t_quote" }
+tap_test_program { name = "t_random" }
+tap_test_program { name = "t_refcount" }
+tap_test_program { name = "t_shells" }
+tap_test_program { name = "t_shlibs" }
+tap_test_program { name = "t_truthy" }
+tap_test_program { name = "t_usergroup" }
+tap_test_program { name = "t_usergroup_FreeBSD" }
+tap_test_program { name = "t_usergroup_Linux" }
+tap_test_program { name = "t_usergroup_MirBSD" }
+tap_test_program { name = "t_usergroup_NetBSD" }
+tap_test_program { name = "t_usergroup_exists" }
+tap_test_program { name = "t_usergroup_mock" }
+tap_test_program { name = "t_users" }
+tap_test_program { name = "t_version" }
