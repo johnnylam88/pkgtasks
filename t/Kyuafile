@@ -48,3 +48,4 @@ tap_test_program { name = "t_usergroup_exists" }
 tap_test_program { name = "t_usergroup_mock" }
 tap_test_program { name = "t_users" }
 tap_test_program { name = "t_version" }
+tap_test_program { name = "t_which" }

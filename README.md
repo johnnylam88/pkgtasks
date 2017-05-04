@@ -87,6 +87,7 @@ scripts:
   * `say`: write to standard output with a tag
   * `truthy`: evaluate truthiness
   * `version`: compare version strings
+  * `which`: locate a program file in the $PATH
 
 The documentation for each of these tasks is in man-page style in the
 header comments for each task module.

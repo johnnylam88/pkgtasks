@@ -83,6 +83,7 @@ dist_pkgdata_DATA += usergroup_NetBSD.subr
 dist_pkgdata_DATA += usergroup_exists.subr
 dist_pkgdata_DATA += usergroup_mock.subr
 dist_pkgdata_DATA += users.subr
+dist_pkgdata_DATA += which.subr
 
 pkgdata_DATA = version.subr
 CLEANFILES = version.subr
@@ -384,6 +385,14 @@ EXTRA_DIST += t/t_version.sh
 t/t_version: t/t_version.sh version.subr $(builddir)/t/build_test
 	-$(MKDIR_P) $(builddir)/t
 	$(AM_V_GEN)target="$(builddir)/t/t_version" source="$(srcdir)/t/t_version.sh"; \
+	$(BUILD_TEST)
+
+pkgtests_SCRIPTS += t/t_which
+CLEANFILES += t/t_which
+EXTRA_DIST += t/t_which.sh
+t/t_which: t/t_which.sh $(builddir)/t/build_test
+	-$(MKDIR_P) $(builddir)/t
+	$(AM_V_GEN)target="$(builddir)/t/t_which" source="$(srcdir)/t/t_which.sh"; \
 	$(BUILD_TEST)
 
 PHONY_TARGETS += check-run-tets
