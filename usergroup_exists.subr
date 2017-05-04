@@ -91,7 +91,6 @@ task_group_exists()
 	# Check using chgrp(1) to work properly in an NSS/NIS environment.
 	__group_tmpdir__=$( task_maketemp -dq ) || return 3
 	local testpath="$__group_tmpdir__/group_exists"
-	echo 1>&2 "$__group_tmpdir__"
 	task_createfile "$testpath"
 
 	local result=0
