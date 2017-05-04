@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# $NetBSD$
-#
 # Copyright (c) 2017 The NetBSD Foundation, Inc.
 # All rights reserved.
 #
@@ -292,8 +290,6 @@ EOF
 
 generate()
 {
-	echo "# ""$""NetBSD""$"
-	echo "#"
 	gen_license
 	echo
 	gen_doc

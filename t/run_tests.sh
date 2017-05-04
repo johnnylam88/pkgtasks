@@ -1,7 +1,5 @@
 #! __POSIX_SHELL__
 #
-# $NetBSD$
-#
 # Copyright (c) 2017 The NetBSD Foundation, Inc.
 # All rights reserved.
 #

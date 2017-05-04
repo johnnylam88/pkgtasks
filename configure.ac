@@ -1,5 +1,3 @@
-dnl $NetBSD$
-dnl
 dnl Copyright (c) 2017 The NetBSD Foundation, Inc.
 dnl All rights reserved.
 dnl
