@@ -206,7 +206,6 @@ _task_fonts_index_ttf()
 _task_fonts_index_type1()
 {
 	: ${MKFONTSCALE:=mkfontscale}
-	: ${RM:=rm}
 	: ${TYPE1INST:=type1inst}
 
 	# Guard against ${PKG_PREFIX} == "/".
@@ -224,11 +223,7 @@ _task_fonts_index_type1()
 		#
 		( cd "$fontdir" && ${MKFONTSCALE} >/dev/null 2>&1 ) || return 1
 		;;
-	*)	( local result=0
-		  cd "$fontdir" && ${TYPE1INST} >/dev/null 2>&1 || result=1
-		  ${RM} -f type1inst.log
-		  return $result
-		) || return 1
+	*)	( cd "$fontdir" && ${TYPE1INST} >/dev/null 2>&1 ) || return 1
 		;;
 	esac
 	return 0
