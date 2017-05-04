@@ -158,7 +158,12 @@ _task_lock_create()
 	echo "$target" > $target
 
 	while : ; do
-		# symlink(2) is atomic
+		# symlink(2) is atomic.
+		#
+		# Redirect standard error so an error message isn't
+		# written every time this symlink(2) is attempted while
+		# we're spinning.
+		#
 		if ${LN} -s "$target" "$lockfile" >/dev/null 2>&1; then
 			# lock created
 			return 0
@@ -184,7 +189,11 @@ _task_lock_release()
 
 	# release a lock
 	local release="$lockfile.release"
-	# rename(2) is atomic
+	# rename(2) is atomic.
+	#
+	# Redirect standard error so an error message isn't written every
+	# time this rename(2) is attempted.
+	#
 	if ${MV} -f "$lockfile" "$release" >/dev/null 2>&1; then
 		# lock released
 		if [ -f "$release" ]; then

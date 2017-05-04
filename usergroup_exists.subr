@@ -88,12 +88,16 @@ task_group_exists()
 
 	[ -n "$group" ] || return 3
 
-	# Check using chgrp(1) to work properly in an NSS/NIS environment.
+	# Check using chown(1) to work properly in an NSS/NIS environment.
 	__group_tmpdir__=$( task_maketemp -dq ) || return 3
 	local testpath="$__group_tmpdir__/group_exists"
 	task_createfile "$testpath"
 
 	local result=0
+	#
+	# Redirect standarrd error below because failing to chgrp(2) is
+	# part of the test and not actually an error.
+	#
 	if ${CHOWN} ":$group" "$testpath" >/dev/null 2>&1; then
 		# group exists
 		if [ -n "$groupid" ]; then
@@ -154,6 +158,10 @@ task_user_exists()
 	task_createfile "$testpath"
 
 	local result=0
+	#
+	# Redirect standarrd error below because failing to chown(2) is
+	# part of the test and not actually an error.
+	#
 	if ${CHOWN} "$user" "$testpath" >/dev/null 2>&1; then
 		# user exists
 		if [ -n "$userid" ]; then

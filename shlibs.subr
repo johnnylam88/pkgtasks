@@ -72,8 +72,8 @@ task_shlibs()
 
 	local result=0
 	case $action in
-	add)	${LDCONFIG} >/dev/null 2>&1 || result=1 ;;
-	remove)	${LDCONFIG} >/dev/null 2>&1 || result=1 ;;
+	add)	${LDCONFIG} >/dev/null || result=1 ;;
+	remove)	${LDCONFIG} >/dev/null || result=1 ;;
 	esac
 
 	if [ $result -eq 0 ]; then

@@ -82,8 +82,8 @@ task_addgroup()
 	[ -n "$group" ] || return 1
 
 	case $groupid in
-	"")	platform_groupadd "$group" >/dev/null 2>&1 ;;
-	*)	platform_groupadd -g "$groupid" "$group" >/dev/null 2>&1 ;;
+	"")	platform_groupadd "$group" >/dev/null ;;
+	*)	platform_groupadd -g "$groupid" "$group" >/dev/null ;;
 	esac
 }
 
@@ -111,9 +111,9 @@ task_adduser()
 	case $userid in
 	"")	platform_useradd \
 	  		-c "$descr" -d "$home" -s "$shell" -g "$group" \
-			"$user" >/dev/null 2>&1 ;;
+			"$user" >/dev/null ;;
 	*)	platform_useradd \
 	  		-c "$descr" -d "$home" -s "$shell" -g "$group" \
-			-u "$userid" "$user" >/dev/null 2>&1 ;;
+			-u "$userid" "$user" >/dev/null ;;
 	esac
 }
