@@ -40,6 +40,11 @@ test_setup()
 
 	# Prevent current directory from being auto-removed because it's empty.
 	task_createfile non-empty
+
+	MKFONTDIR="mock_mkfontdir"
+	MKFONTSCALE="mock_mkfontscale"
+	TTMKFDIR="mock_ttmkfdir"
+	TYPE1INST="mock_type1inst"
 }
 
 test_destdir_setup()
@@ -53,23 +58,23 @@ test_destdir_setup()
 }
 
 # Mock font index generator utilities.
-mkfontdir()
+mock_mkfontdir()
 {
 	task_createfile encodings.dir
 }
 
-mkfontscale()
+mock_mkfontscale()
 {
 	task_createfile fonts.scale
 }
 
-ttmkfdir()
+mock_ttmkfdir()
 {
 	task_createfile fonts.dir
 	task_createfile fonts.scale
 }
 
-type1inst()
+mock_type1inst()
 {
 	task_createfile type1inst.log
 	task_createfile Fontmap.1

@@ -36,9 +36,13 @@
 #	The function reads standard input line by line and looks for
 #	lines of the form:
 #
-#	    # FONTS: <fontdir> <fonttype>
+#	    # FONTS: <fontdir> <fonttype> [<encodings_dir>]
 #
-#	If any of the fontdir path is relative, then it is assumed to be
+#	<encodings_dir> is an optional argument containing the location
+#	to the X11 font encoding information files and is used for the
+#	"x11" font type.
+#
+#	If any of the paths are relative, then it is assumed to be
 #	relative to ${PKG_PREFIX}.
 #
 #	Both the "add" and "remove" actions regenerate the index files
@@ -80,6 +84,9 @@
 #	TTMKFDIR
 #		The name or path to the ttmkfdir(1) utility.
 #
+#	X11_ENCODINGSDIR
+#		The directory containing font-encoding information files.
+#
 
 __task_fonts__="yes"
 __task_fonts_init__="_task_fonts_init"
@@ -89,6 +96,7 @@ task_load echo
 task_load dirwalk
 task_load quote
 task_load truthy
+task_load which
 
 task_fonts()
 {
@@ -121,7 +129,7 @@ task_fonts()
 
 	result=0
 	local hash tag fontdir fonttype
-	while read hash tag fontdir fonttype; do
+	while read hash tag fontdir fonttype encodings_dir; do
 		# Filter for "# FONTS:".
 		case $hash/$tag in
 		"#/FONTS:")
@@ -139,6 +147,11 @@ task_fonts()
 		[!/]*)	fontdir="$prefix/$fontdir" ;;
 		esac
 		fontdir="${PKG_DESTDIR}$fontdir"
+		case $encodings_dir in
+		"")	encodings_dir=${X11_ENCODINGSDIR} ;;
+		[!/]*)	encodings_dir="$prefix/$encodings_dir" ;;
+		esac
+		encodings_dir="${PKG_DESTDIR}$encodings_dir"
 
 		if [ ! -d "$fontdir" ]; then
 			task_echo "    ! fonts directory missing: $fontdir"
@@ -159,7 +172,7 @@ task_fonts()
 			[Tt][Yy][Pp][Ee]1)
 		  		_task_fonts_index_type1 "$fontdir" || line_result=1 ;;
 			[Xx]11)
-				_task_fonts_index_x11 "$fontdir" || line_result=1 ;;
+				_task_fonts_index_x11 "$fontdir" "$encodings_dir" || line_result=1 ;;
 			esac
 		fi
 		if [ -n "$update_fonts" -a $line_result -eq 0 ]; then
@@ -180,24 +193,36 @@ _task_fonts_index_ttf()
 	: ${MKFONTSCALE:=mkfontscale}
 	: ${TTMKFDIR:=ttmkfdir}
 
-	# Guard against ${PKG_PREFIX} == "/".
-	local prefix
-	case ${PKG_PREFIX}/ in
-	//)	prefix= ;;
-	*)	prefix=${PKG_PREFIX} ;;
-	esac
-
 	local fontdir="$1"; shift
-	case $fontdir in
-	$prefix/*)
-		# Assume font directories under ${PKG_PREFIX} are indexed
-		# with mkfontscale.
-		#
-		( cd "$fontdir" && ${MKFONTSCALE} >/dev/null ) || return 1
-		;;
-	*)	( cd "$fontdir" && ${TTMKFDIR} >/dev/null ) || return 1
-		;;
-	esac
+	local command=
+
+	# Cache mkfontscale(1) location.
+	if [ -z "$__task_fonts_mkfontscale__" ]; then
+		__task_fonts_mkfontscale__=$( task_which "${MKFONTSCALE}" )
+		[ -n "$__task_fonts_mkfontscale__" ] ||
+			__task_fonts_mkfontscale__="missing"
+	fi
+	if [ "$__task_fonts_mkfontscale__" != "missing" ]; then
+		command=$__task_fonts_mkfontscale__
+	else
+		# Cache ttmkfdir(1) location.
+		if [ -z "$__task_fonts_ttmkfdir__" ]; then
+			__task_fonts_ttmkfdir__=$( task_which "${TTMKFDIR}" )
+			[ -n "$__task_fonts_ttmkfdir__" ] ||
+				__task_fonts_ttmkfdir__="missing"
+		fi
+		if [ "$__task_fonts_ttmkfdir__" != "missing" ]; then
+			command=$__task_fonts_ttmkfdir__
+		elif [ -n "${MKFONTSCALE}" ]; then
+			command=${MKFONTSCALE}
+		elif [ -n "${TTMKFDIR}" ]; then
+			command=${TTMKFDIR}
+		else
+			task_echo "    ! ttf-indexing command missing"
+			return 1
+		fi
+	fi
+	( cd "$fontdir" && $command >/dev/null )
 	return 0
 }
 
@@ -206,24 +231,37 @@ _task_fonts_index_type1()
 	: ${MKFONTSCALE:=mkfontscale}
 	: ${TYPE1INST:=type1inst}
 
-	# Guard against ${PKG_PREFIX} == "/".
-	local prefix
-	case ${PKG_PREFIX}/ in
-	//)	prefix= ;;
-	*)	prefix=${PKG_PREFIX} ;;
-	esac
-
 	local fontdir="$1"; shift
-	case $fontdir in
-	$prefix/*)
-		# Assume font directories under ${PKG_PREFIX} are indexed
-		# with mkfontscale.
-		#
-		( cd "$fontdir" && ${MKFONTSCALE} >/dev/null ) || return 1
-		;;
-	*)	( cd "$fontdir" && ${TYPE1INST} >/dev/null ) || return 1
-		;;
-	esac
+	local command=
+
+	# Cache mkfontscale(1) location.
+	if [ -z "$__task_fonts_mkfontscale__" ]; then
+		__task_fonts_mkfontscale__=$( task_which "${MKFONTSCALE}" )
+		[ -n "$__task_fonts_mkfontscale__" ] ||
+			__task_fonts_mkfontscale__="missing"
+	fi
+	if [ "$__task_fonts_mkfontscale__" != "missing" ]; then
+		command=$__task_fonts_mkfontscale__
+	else
+		# Cache type1inst(1) location.
+		if [ -z "$__task_fonts_type1inst__" ]; then
+			__task_fonts_type1inst__=$( task_which "${TYPE1INST}" )
+			[ -n "$__task_fonts_type1inst__" ] ||
+				__task_fonts_type1inst__="missing"
+		fi
+		if [ "$__task_fonts_type1inst__" != "missing" ]; then
+			command=$__task_fonts_type1inst__
+		elif [ -n "${MKFONTSCALE}" ]; then
+			command=${MKFONTSCALE}
+		elif [ -n "${TYPE1INST}" ]; then
+			command=${TTMKFDIR}
+		else
+			task_echo "    ! type1-indexing command missing"
+			return 1
+		fi
+	fi
+	( cd "$fontdir" && $command >/dev/null )
+
 	return 0
 }
 
@@ -232,12 +270,27 @@ _task_fonts_index_x11()
 	: ${MKFONTDIR:=mkfontdir}
 
 	local fontdir="$1"; shift
-	if [ -z "${X11_ENCODINGSDIR}" ]; then
-		( cd "$fontdir" && ${MKFONTDIR} >/dev/null ) || return 1
+	local encodings_dir="$1"; shift
+	local command=
+
+	# Cache mkfontdir(1) location.
+	if [ -z "$__task_fonts_mkfontdir__" ]; then
+		__task_fonts_mkfontdir__=$( task_which "${MKFONTDIR}" )
+		[ -n "$__task_fonts_mkfontdir__" ] ||
+			__task_fonts_mkfontdir__="missing"
+	fi
+	if [ "$__task_fonts_mkfontdir__" != "missing" ]; then
+		command=$__task_fonts_mkfontdir__
+	elif [ -n "${MKFONTDIR}" ]; then
+		command=${MKFONTDIR}
 	else
-		( cd "$fontdir" &&
-		  ${MKFONTDIR} -e "${PKG_DESTDIR}${X11_ENCODINGSDIR}" >/dev/null
-		) || return 1
+		task_echo "    ! x11-indexing command missing"
+		return 1
+	fi
+	if [ -n "$encodings_dir" ]; then
+		( cd "$fontdir" && $command -e "$encodings_dir" >/dev/null )
+	else
+		( cd "$fontdir" && $command >/dev/null )
 	fi
 	return 0
 }
@@ -287,3 +340,9 @@ _task_fonts_init()
 # if an error occors.
 #
 __task_fonts_dirs__=
+
+# Static variables for the paths to indexing utilities.
+__task_fonts_mkfontdir__=
+__task_fonts_mkfontscale__=
+__task_fonts_ttmkfdir__=
+__task_fonts_type1inst__=
