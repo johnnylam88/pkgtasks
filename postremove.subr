@@ -63,6 +63,7 @@ task_load info_files
 task_load ocaml_findlib
 task_load shells
 task_load shlibs
+task_load sort
 task_load users
 
 task_postremove()
@@ -95,9 +96,13 @@ task_postremove()
 
 	local post_fn
 	for post_fn in $post_actions; do
-		if $post_fn remove < $datafile; then
-			: "success"
-		else
+		case $post_fn in
+		task_directories)
+			# Reverse-sort.
+			task_sort -r < $datafile | $post_fn remove ;;
+		*)	$post_fn remove < $datafile ;;
+		esac
+		if [ $? -gt 0 ]; then
 			# Any errors during postremove are non-fatal.
 			post_checks="$post_checks $post_fn"
 			result=1
@@ -109,7 +114,12 @@ task_postremove()
 	# pass.
 	#
 	for post_fn in $post_checks; do
-		$post_fn check-remove < $datafile
+		case $post_fn in
+		task_directories)
+			# Reverse-sort.
+			task_sort -r < $datafile | $post_fn check-remove ;;
+		*)	$post_fn check-remove < $datafile ;;
+		esac
 	done
 
 	return $result

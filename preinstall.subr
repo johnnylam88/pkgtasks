@@ -53,6 +53,7 @@ __task_preinstall__="yes"
 
 task_load directories
 task_load groups
+task_load sort
 task_load users
 
 task_preinstall()
@@ -83,9 +84,10 @@ task_preinstall()
 	fi
 
 	# Create directories so that pre-existing directories can be
-	# correctly identified.  Any errors in creating directories
-	# are non-fatal.
+	# correctly identified.  Sort the entries prior to creation to
+	# create path components in order.  Any errors in creating
+	# directories are non-fatal.
 	#
-	task_directories add < $datafile
+	task_sort < $datafile | task_directories add
 	return 0
 }
