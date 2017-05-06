@@ -73,6 +73,7 @@ dist_pkgdata_DATA += refcount_file.subr
 dist_pkgdata_DATA += say.subr
 dist_pkgdata_DATA += shells.subr
 dist_pkgdata_DATA += shlibs.subr
+dist_pkgdata_DATA += sort.subr
 dist_pkgdata_DATA += truthy.subr
 dist_pkgdata_DATA += unittest.subr
 dist_pkgdata_DATA += usergroup.subr
@@ -305,6 +306,14 @@ EXTRA_DIST += t/t_shlibs.sh
 t/t_shlibs: t/t_shlibs.sh $(builddir)/t/build_test
 	-$(MKDIR_P) $(builddir)/t
 	$(AM_V_GEN)target="$(builddir)/t/t_shlibs" source="$(srcdir)/t/t_shlibs.sh"; \
+	$(BUILD_TEST)
+
+pkgtests_SCRIPTS += t/t_sort
+CLEANFILES += t/t_sort
+EXTRA_DIST += t/t_sort.sh
+t/t_sort: t/t_sort.sh $(builddir)/t/build_test
+	-$(MKDIR_P) $(builddir)/t
+	$(AM_V_GEN)target="$(builddir)/t/t_sort" source="$(srcdir)/t/t_sort.sh"; \
 	$(BUILD_TEST)
 
 pkgtests_SCRIPTS += t/t_truthy

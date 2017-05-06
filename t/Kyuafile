@@ -38,6 +38,7 @@ tap_test_program { name = "t_random" }
 tap_test_program { name = "t_refcount" }
 tap_test_program { name = "t_shells" }
 tap_test_program { name = "t_shlibs" }
+tap_test_program { name = "t_sort" }
 tap_test_program { name = "t_truthy" }
 tap_test_program { name = "t_usergroup" }
 tap_test_program { name = "t_usergroup_FreeBSD" }
