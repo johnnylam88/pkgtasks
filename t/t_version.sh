@@ -265,4 +265,16 @@ test37()
 	fi
 }
 
+test38()
+{
+	describe="version_check Charlie < Delta"
+	task_version_check Charlie "<" Delta
+}
+
+test39()
+{
+	describe="version_check Delta > Charlie"
+	task_version_check Delta ">" Charlie
+}
+
 task_run_tests "$@"
