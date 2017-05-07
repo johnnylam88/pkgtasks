@@ -116,6 +116,7 @@ __task_refcount_file_init__="_task_refcount_file_init"
 
 task_load cleanup
 task_load makedir
+task_load maketemp
 task_load match
 task_load quote
 
@@ -212,27 +213,36 @@ _task_refcount_file_add()
 	local countfile
 	_task_refcount_file_countfile "$db" "$resource"
 	# countfile is now set to the location of the count file.
-	local countfile_tmp="$countfile.pkgsrc.$$"
 	local shadowdir="${countfile%/*}"
 	local token="${PKG_DBDIR}/${PKGNAME}"
 
 	task_makedir "$shadowdir" 2>/dev/null
 	[ -d "$shadowdir" ] || return 1
 
-	local quoted
-	task_quote "$countfile_tmp"
-	__task_refcount_file_temps__="$__task_refcount_file_temps__ $quoted"
-	{ if [ -f "$countfile" ]; then
-		task_match -sv "$token" < $countfile
-	  fi
-	  echo "$token"
-	} > $countfile_tmp
-
 	local result=0
-	# rename(2) is atomic
-	${MV} -f "$countfile_tmp" "$countfile" || result=1
+	local temp temp_quoted quoted
+	temp=$( task_maketemp "$countfile.XXXXXXXXXX" )
+	if [ -n "$temp" ]; then
+		task_quote "$temp"
+		temp_quoted=$quoted
+		__task_refcount_file_temps__="$__task_refcount_file_temps__ $temp_quoted"
+		{ if [ -f "$countfile" ]; then
+			task_match -sv "$token" < $countfile
+		  fi
+		  echo "$token"
+		} > $temp
+		# rename(2) is atomic
+		if ${MV} -f "$temp" "$countfile"; then
+			__task_refcount_file_temps__=${__task_refcount_file_temps__% $temp_quoted}
+		else
+			result=1
+		fi
+	else
+		# cannot create temporary file
+		result=1
+	fi
 
-	[ $result -eq 0 ] || _task_refcount_file_cleanup
+	_task_refcount_file_cleanup
 	return $result
 }
 
@@ -251,35 +261,45 @@ _task_refcount_file_remove()
 	local countfile
 	_task_refcount_file_countfile "$db" "$resource"
 	# countfile is now set to the location of the count file.
-	local countfile_tmp="$countfile.pkgsrc.$$"
 	local shadowdir="${countfile%/*}"
 	local token="${PKG_DBDIR}/${PKGNAME}"
 
 	local result=0
 	if [ -f "$countfile" ]; then
-		local quoted
-		task_quote "$countfile_tmp"
-		__task_refcount_file_temps__="$__task_refcount_file_temps__ $quoted"
-		task_match -sv "$token" < $countfile > $countfile_tmp
-		local remaining=
-		if [ -f "$countfile_tmp" ]; then
-			local line
-			while read line; do
-				# reference file is non-empty
-				remaining="yes"
-				break
-			done < $countfile_tmp
-			# rename(2) is atomic
-			${MV} -f "$countfile_tmp" "$countfile" || result=1
-		fi
-		if [ -z "$remaining" ]; then
-			${RM} -f "$countfile" || result=1
+		local temp temp_quoted quoted
+		temp=$( task_maketemp "$countfile.XXXXXXXXXX" )
+		if [ -n "$temp" ]; then
+			task_quote "$temp"
+			temp_quoted=$quoted
+			__task_refcount_file_temps__="$__task_refcount_file_temps__ $temp_quoted"
+			task_match -sv "$token" < $countfile > $temp
+			local remaining=
+			if [ -f "$temp" ]; then
+				local line
+				while read line; do
+					# reference file is non-empty
+					remaining="yes"
+					break
+				done < $temp
+				# rename(2) is atomic
+				if ${MV} -f "$temp" "$countfile"; then
+					__task_refcount_file_temps__=${__task_refcount_file_temps__% $temp_quoted}
+				else
+					result=1
+				fi
+			else
+				# cannot create temporary file
+				result=1
+			fi
+			if [ -z "$remaining" ]; then
+				${RM} -f "$countfile" || result=1
+			fi
 		fi
 	fi
 	# Remove shadow directory if empty.
 	${RMDIR} -p "$shadowdir" 2>/dev/null
 
-	[ $result -eq 0 ] || _task_refcount_file_cleanup
+	_task_refcount_file_cleanup
 	return $result
 }
 
@@ -341,27 +361,36 @@ _task_refcount_file_prop_put()
 	local propfile
 	_task_refcount_file_propfile "$db" "$resource" "$property"
 	# propfile is now set to the location of the property file.
-	local propfile_tmp="$propfile.pkgsrc.$$"
 
 	local shadowdir="${propfile%/*}"
 	task_makedir "$shadowdir" 2>/dev/null
 	[ -d "$shadowdir" ] || return 1
 
-	local quoted
-	task_quote "$propfile_tmp"
-	__task_refcount_file_temps__="$__task_refcount_file_temps__ $quoted"
-	if [ $# -gt 0 ]; then
-		echo "$@" > $propfile_tmp
+	local result=0
+	local temp temp_quoted quoted
+	temp=$( task_maketemp "$propfile.XXXXXXXXXX" )
+	if [ -n "$temp" ]; then
+		task_quote "$temp"
+		temp_quoted=$quoted
+		__task_refcount_file_temps__="$__task_refcount_file_temps__ $temp_quoted"
+		if [ $# -gt 0 ]; then
+			echo "$@" > $temp
+		else
+			local token="${PKG_DBDIR}/${PKGNAME}"
+			echo "$token" > $temp
+		fi
+		# rename(2) is atomic
+		if ${MV} -f "$temp" "$propfile"; then
+			__task_refcount_file_temps__=${__task_refcount_file_temps__% $temp_quoted}
+		else
+			result=1
+		fi
 	else
-		local token="${PKG_DBDIR}/${PKGNAME}"
-		echo "$token" > $propfile_tmp
+		# cannot create temporary file
+		result=1
 	fi
 
-	local result=0
-	# rename(2) is atomic
-	${MV} -f "$propfile_tmp" "$propfile" || result=1
-
-	[ $result -eq 0 ] || _task_refcount_file_cleanup
+	_task_refcount_file_cleanup
 	return $result
 }
 

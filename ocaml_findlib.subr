@@ -97,6 +97,7 @@ __task_ocaml_findlib_init__="_task_ocaml_findlib_init"
 task_load cleanup
 task_load echo
 task_load lock
+task_load maketemp
 task_load match
 task_load quote
 task_load truthy
@@ -163,9 +164,6 @@ task_ocaml_findlib()
 		[!/]*)	ldconf="$prefix/$ldconf" ;;
 		esac
 		ldconf="${PKG_DESTDIR}$ldconf"
-		temp="$ldconf.pkgsrc.$$"
-		task_quote "$temp"
-		temp_quoted=$quoted
 
 		line_result=0
 		case $action in
@@ -179,55 +177,67 @@ task_ocaml_findlib()
 		if [ $line_result -eq 0 ]; then
 			case $action in
 			add)	if [ -n "$findlib_register" ]; then
-					if [ -f "$ldconf" ] &&
-					   task_match -qw "$libdir" < $ldconf; then
+					if [ -f "$ldconf" ] && task_match -qw "$libdir" < $ldconf; then
 						task_echo "    ! path already added: $libdir"
 					else
-						__task_ocaml_findlib_temps__="$__task_ocaml_findlib_temps__ $temp_quoted"
-						if [ ! -f "$ldconf" ]; then
-							echo "$libdir"
+						temp=$( task_maketemp "$ldconf.XXXXXXXXXX" )
+						if [ -n "$temp" ]; then
+							task_quote "$temp"
+							temp_quoted="$quoted"
+							__task_ocaml_findlib_temps__="$__task_ocaml_findlib_temps__ $temp_quoted"
+							if [ ! -f "$ldconf" ]; then
+								echo "$libdir"
+							else
+								task_match -vw "$libdir" < $ldconf
+								echo "$libdir"
+							fi > $temp
+							# rename(2) is atomic.
+							if ${MV} -f "$temp" "$ldconf"; then
+								task_echo "    > path added: $libdir"
+								__task_ocaml_findlib_temps__=${__task_ocaml_findlib_temps__% $temp_quoted}
+							else
+								task_echo "    ! path not added: $libdir"
+								line_result=1
+							fi
 						else
-							task_match -vw "$libdir" < $ldconf
-							echo "$libdir"
-						fi > $temp
-						# rename(2) is atomic.
-						if ${MV} -f "$temp" "$ldconf"; then
-							task_echo "    > path added: $libdir"
-						else
-							task_echo "    ! path not added: $libdir"
+							task_echo "    ! cannot create temporary file for $ldconf"
 							line_result=1
 						fi
-						__task_ocaml_findlib_temps__=${__task_ocaml_findlib_temps__% $temp_quoted}
 					fi
 				fi ;;
 			remove)	if [ -n "$findlib_register" ]; then
-					if [ -f "$ldconf" ] &&
-					   task_match -qw "$libdir" < $ldconf; then
-						__task_ocaml_findlib_temps__="$__task_ocaml_findlib_temps__ $temp_quoted"
-						task_match -vw "$libdir" < $ldconf > $temp
-						# rename(2) is atomic.
-						if ${MV} -f "$temp" "$ldconf"; then
-							task_echo "    > path removed: $libdir"
+					if [ -f "$ldconf" ] && task_match -qw "$libdir" < $ldconf; then
+						temp=$( task_maketemp "$ldconf.XXXXXXXXXX" )
+						if [ -n "$temp" ]; then
+							task_quote "$temp"
+							temp_quoted="$quoted"
+							__task_ocaml_findlib_temps__="$__task_ocaml_findlib_temps__ $temp_quoted"
+							task_match -vw "$libdir" < $ldconf > $temp
+							# rename(2) is atomic.
+							if ${MV} -f "$temp" "$ldconf"; then
+								task_echo "    > path removed: $libdir"
+								__task_ocaml_findlib_temps__=${__task_ocaml_findlib_temps__% $temp_quoted}
+							else
+								task_echo "    ! path not removed: $libdir"
+								line_result=1
+							fi
 						else
-							task_echo "    ! path not removed: $libdir"
+							task_echo "    ! cannot create temporary file for $ldconf"
 							line_result=1
 						fi
-						__task_ocaml_findlib_temps__=${__task_ocaml_findlib_temps__% $temp_quoted}
 					else
 						task_echo "    > path already removed: $libdir"
 					fi
 				fi ;;
 			check-add)
-				if [ -f "$ldconf" ] &&
-				   task_match -qw "$libdir" < $ldconf; then
+				if [ -f "$ldconf" ] && task_match -qw "$libdir" < $ldconf; then
 				   	: "path already added"
 				else
 					task_echo "!!! INFO: ${PKGNAME}: Add path \"$libdir\" to $ldconf."
 					line_result=1
 				fi ;;
 			check-remove)
-				if [ -f "$ldconf" ] &&
-				   task_match -qw "$libdir" < $ldconf; then
+				if [ -f "$ldconf" ] && task_match -qw "$libdir" < $ldconf; then
 					task_echo "!!! INFO: ${PKGNAME}: Remove path \"$libdir\" from $ldconf."
 					line_result=1
 				fi ;;

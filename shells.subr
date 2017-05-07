@@ -91,6 +91,7 @@ __task_shells_init__="_task_shells_init"
 task_load cleanup
 task_load echo
 task_load lock
+task_load maketemp
 task_load match
 task_load quote
 task_load truthy
@@ -149,9 +150,6 @@ task_shells()
 		[!/]*)	shelldb="$prefix/$shelldb" ;;
 		esac
 		shelldb="${PKG_DESTDIR}$shelldb"
-		temp="$shelldb.pkgsrc.$$"
-		task_quote "$temp"
-		temp_quoted=$quoted
 
 		line_result=0
 		case $action in
@@ -165,55 +163,67 @@ task_shells()
 		if [ $line_result -eq 0 ]; then
 			case $action in
 			add)	if [ -n "$register_shells" ]; then
-					if [ -f "$shelldb" ] &&
-					   task_match -qw "$shell" < $shelldb; then
+					if [ -f "$shelldb" ] && task_match -qw "$shell" < $shelldb; then
 					   	task_echo "    ! shell already added: $shell"
 					else
-				  		__task_shells_temps__="$__task_shells_temps__ $temp_quoted"
-						if [ ! -f "$shelldb" ]; then
-							echo "$shell"
+						temp=$( task_maketemp $shelldb.XXXXXXXXXX )
+						if [ -n "$temp" ]; then
+							task_quote "$temp"
+							temp_quoted="$quoted"
+							__task_shells_temps__="$__task_shells_temps__ $temp_quoted"
+							if [ ! -f "$shelldb" ]; then
+								echo "$shell"
+							else
+								task_match -vw "$shell" < $shelldb
+								echo "$shell"
+							fi > $temp
+							# rename(2) is atomic.
+							if ${MV} -f "$temp" "$shelldb"; then
+								task_echo "    > shell added: $shell"
+								__task_shells_temps__=${__task_shells_temps__% $temp_quoted}
+							else
+								task_echo "    ! shell not added: $shell"
+								line_result=1
+							fi
 						else
-							task_match -vw "$shell" < $shelldb
-							echo "$shell"
-						fi > $temp
-						# rename(2) is atomic.
-						if ${MV} -f "$temp" "$shelldb"; then
-							task_echo "    > shell added: $shell"
-						else
-							task_echo "    ! shell not added: $shell"
+							task_echo "    ! cannot create temporary file for $shelldb"
 							line_result=1
 						fi
-						__task_shells_temps__=${__task_shells_temps__% $temp_quoted}
 					fi
 				fi ;;
 			remove)	if [ -n "$register_shells" ]; then
-					if [ -f "$shelldb" ] &&
-					   task_match -qw "$shell" < $shelldb; then
-				  		__task_shells_temps__="$__task_shells_temps__ $temp_quoted"
-						task_match -vw "$shell" < $shelldb > $temp
-						# rename(2) is atomic.
-						if ${MV} -f "$temp" "$shelldb"; then
-							task_echo "    > shell removed: $shell"
+					if [ -f "$shelldb" ] && task_match -qw "$shell" < $shelldb; then
+						temp=$( task_maketemp $shelldb.XXXXXXXXXX )
+						if [ -n "$temp" ]; then
+							task_quote "$temp"
+							temp_quoted="$quoted"
+							__task_shells_temps__="$__task_shells_temps__ $temp_quoted"
+							task_match -vw "$shell" < $shelldb > $temp
+							# rename(2) is atomic.
+							if ${MV} -f "$temp" "$shelldb"; then
+								task_echo "    > shell removed: $shell"
+								__task_shells_temps__=${__task_shells_temps__% $temp_quoted}
+							else
+								task_echo "    ! shell not removed: $shell"
+								line_result=1
+							fi
 						else
-							task_echo "    ! shell not removed: $shell"
+							task_echo "    ! cannot create temporary file for $shelldb"
 							line_result=1
 						fi
-						__task_shells_temps__=${__task_shells_temps__% $temp_quoted}
 					else
 						task_echo "    ! shell already removed: $shell"
 					fi
 				fi ;;
 			check-add)
-				if [ -f "$shelldb" ] &&
-				   task_match -qw "$shell" < $shelldb; then
+				if [ -f "$shelldb" ] && task_match -qw "$shell" < $shelldb; then
 				   	: "shell already added"
 				else
 					task_echo "!!! INFO: ${PKGNAME}: Add shell \"$shell\" to $shelldb."
 					line_result=1
 				fi ;;
 			check-remove)
-				if [ -f "$shelldb" ] &&
-				   task_match -qw "$shell" < $shelldb; then
+				if [ -f "$shelldb" ] && task_match -qw "$shell" < $shelldb; then
 					task_echo "!!! INFO: ${PKGNAME}: Remove shell \"$shell\" from $shelldb."
 					line_result=1
 				fi ;;
