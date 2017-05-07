@@ -2,6 +2,20 @@ Package Tasks
 =============
 
 
+Changes in version 1.2
+----------------------
+**Released on 2017-05-07.**
+
+* Be more consistent with using `maketemp` to generate internal
+  temporary files and directories.
+
+* Added the `sort` task to sort lines from standard input.
+
+* Sort input when performing `add` action of `directories` task,
+  and reverse sort when performing `remove` action.  This causes
+  path components to be created and removed in the correct order.
+
+
 Changes in version 1.1
 ----------------------
 
