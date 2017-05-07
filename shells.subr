@@ -166,7 +166,7 @@ task_shells()
 					if [ -f "$shelldb" ] && task_match -qw "$shell" < $shelldb; then
 					   	task_echo "    ! shell already added: $shell"
 					else
-						temp=$( task_maketemp $shelldb.XXXXXXXXXX )
+						temp=$( task_maketemp "$shelldb.pkgtasks.XXXXXXXXXX" )
 						if [ -n "$temp" ]; then
 							task_quote "$temp"
 							temp_quoted="$quoted"
@@ -193,7 +193,7 @@ task_shells()
 				fi ;;
 			remove)	if [ -n "$register_shells" ]; then
 					if [ -f "$shelldb" ] && task_match -qw "$shell" < $shelldb; then
-						temp=$( task_maketemp $shelldb.XXXXXXXXXX )
+						temp=$( task_maketemp "$shelldb.pkgtasks.XXXXXXXXXX" )
 						if [ -n "$temp" ]; then
 							task_quote "$temp"
 							temp_quoted="$quoted"

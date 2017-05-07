@@ -150,7 +150,7 @@ _task_lock_create()
 	local lockfile="$1"; shift
 
 	local target quoted
-	target=$( task_maketemp "$lockfile.XXXXXXXXXX" ) || return 1
+	target=$( task_maketemp "$lockfile.pkgtasks.XXXXXXXXXX" ) || return 1
 	task_quote "$target"
 	__task_lock_temps__="$__task_lock_temps__ $quoted"
 	echo "$target" > $target

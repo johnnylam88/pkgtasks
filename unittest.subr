@@ -256,7 +256,7 @@ _task_tap_line()
 	shift 3
 
 	local test_fn="test$number"
-	local TEST_CURDIR=$( task_maketemp -d -t "$test_fn" )
+	local TEST_CURDIR=$( task_maketemp -d -t "pkgtasks.$test_fn" )
 	( # Redirect fd 6 to standard output.
 	  exec 6>&1
 	  # Close standard output and standard error if quiet.
