@@ -468,8 +468,6 @@ _platform_addgroup_cleanup()
 {
 	: ${RM:=rm}
 
-	: ${PKGNAME:=${0##*/}}
-
 	eval set -- $__platform_addgroup_dirs__
 	local dir
 	for dir; do
@@ -477,7 +475,7 @@ _platform_addgroup_cleanup()
 		case ${dir##*/} in
 		*.tmp.*)
 			${RM} -fr "$dir" ;;
-		*)	echo "!!! WARNING: ${PKGNAME}: Remove directory $dir"
+		*)	echo "!!! WARNING: usergroup: Remove directory $dir"
 		esac
 	done
 	__platform_addgroup_dirs__=
@@ -497,8 +495,6 @@ _platform_adduser_cleanup()
 {
 	: ${RM:=rm}
 
-	: ${PKGNAME:=${0##*/}}
-
 	eval set -- $__platform_adduser_dirs__
 	local dir
 	for dir; do
@@ -506,7 +502,7 @@ _platform_adduser_cleanup()
 		case ${dir##*/} in
 		*.tmp.*)
 			${RM} -fr "$dir" ;;
-		*)	echo "!!! WARNING: ${PKGNAME}: Remove directory $dir"
+		*)	echo "!!! WARNING: usergroup: Remove directory $dir"
 		esac
 	done
 	__platform_adduser_dirs__=
