@@ -30,9 +30,9 @@
 #
 # SYNOPSIS
 #	task_refcount exists database resource
-#	task_refcount add database resource
-#	task_refcount remove database resource
 #	task_refcount delete database resource
+#	task_refcount add [-t token] database resource
+#	task_refcount remove [-t token] database resource
 #
 #	task_refcount prop_exists database resource property
 #	task_refcount prop_put database resource property [value ...]
@@ -41,21 +41,23 @@
 #
 # DESCRIPTION
 #	task_refcount exists database resource
-#		Checks whether the any package has a reference on the
-#		resource.
-#
-#	task_refcount add database resource
-#	task_refcount remove database resource
-#		Adds or removes a reference on the resource by the
-#		package.
+#		Checks whether there is a reference on the resource.
 #
 #	task_refcount delete database resource
 #		Deletes any reference counts and properties on the
 #		resource.
 #
+#	task_refcount add [-t token] database resource
+#	task_refcount remove [-t token] database resource
+#		Adds or removes a reference identified by token on the
+#		resource.
+#
 #	task_refcount prop_exists database resource property
 #		Checks whether a stored value exists for the property on
 #		the resoure for the package.
+#
+#	task_refcount prop_delete database resource property
+#		Removes the property on the resource for the package.
 #
 #	task_refcount prop_put database resource property [value ...]
 #		Stores a value for the property on the resource for the
@@ -68,25 +70,12 @@
 #		value is given, then the default value for the property
 #		is used.
 #
-#	task_refcount prop_delete database resource property
-#		Removes the property on the resource for the package.
-#
 # RETURN VALUES
 #	The exists, prop_exists and prop_match commands return 0 on success,
 #	and >0 otherwise.
 #
 #	The remaining commands return 0 on success, and >0 if an error
 #	occurs.
-#
-# ENVIRONMENT
-#	The following variables are used if they are set:
-#
-#	PKGNAME
-#		The name of the package manipulating the reference counts.
-#
-#	PKG_DBDIR
-#		The location of the package metadata directory database.
-#		The default is "/var/db/pkg".
 #
 # EXAMPLES
 #     o Adding a reference count on resource alpha:

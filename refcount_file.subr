@@ -30,8 +30,8 @@
 #
 # SYNOPSIS
 #	task_refcount_file exists database resource
-#	task_refcount_file add database resource
-#	task_refcount_file remove database resource
+#	task_refcount_file add [-t token] database resource
+#	task_refcount_file remove [-t token] database resource
 #	task_refcount_file delete database resource
 #
 #	task_refcount_file prop_exists database resource property
@@ -101,6 +101,10 @@
 #		A "destdir" prefix that is prepended to all filesystem
 #		paths.  The default value is the empty string.
 #
+#	PKG_METADATA_DIR
+#		The absolute path to the location of the meta-data files
+#		of ${PKGNAME}.  The default is "${PKG_DBDIR}/${PKGNAME}".
+#
 #	PKG_REFCOUNT_DBDIR
 #		The location of the directory tree that shadows the
 #		resources that are reference-counted.  The default is
@@ -135,24 +139,34 @@ task_refcount_file()
 	$fn "$@"
 }
 
-_task_refcount_file_countfile()
+_task_refcount_file_pkg_token()
 {
 	: ${PKGNAME:=${0##*/}}
+	: ${PKG_DBDIR:=/var/db/pkg}
+	: ${PKG_METADATA_DIR:=${PKG_DBDIR}/${PKGNAME}}
+
+	pkg_token=${PKG_METADATA_DIR}
+
+	# POST-CONDITION:
+	# pkg_token is set to the package token unique to the system.
+}
+
+_task_refcount_file_shadowdir()
+{
 	: ${PKG_DBDIR:=/var/db/pkg}
 	: ${PKG_REFCOUNT_DBDIR:=${PKG_DBDIR}.refcount}
 
 	local db="$1"; shift
 	local resource="$1"; shift
 
-	local shadowdir
 	case $resource in
 	/*)	shadowdir="${PKG_REFCOUNT_DBDIR}/$db$resource" ;;
 	*)	shadowdir="${PKG_REFCOUNT_DBDIR}/$db/$resource" ;;
 	esac
-	countfile="${PKG_DESTDIR}$shadowdir/${PKGNAME}"
+	shadowdir="${PKG_DESTDIR}/$shadowdir"
 
 	# POST-CONDITION:
-	# countfile is set to the location of the property file.
+	# shadowdir is set to the location of the shadow directory.
 }
 
 _task_refcount_file_exists()
@@ -160,11 +174,10 @@ _task_refcount_file_exists()
 	local db="$1"; shift
 	local resource="$1"; shift
 
-	local countfile
-	_task_refcount_file_countfile "$db" "$resource"
-	# countfile is now set to the location of the count file.
+	local shadowdir
+	_task_refcount_file_shadowdir "$db" "$resource"
+	# shadowdir is now set to the location of the shadow directory.
 
-	local shadowdir="${countfile%/*}"
 	set -- "$shadowdir"/*
 	local entry
 	for entry; do
@@ -188,11 +201,10 @@ _task_refcount_file_delete()
 	local db="$1"; shift
 	local resource="$1"; shift
 
-	local countfile
-	_task_refcount_file_countfile "$db" "$resource"
-	# countfile is now set to the location of the count file.
+	local shadowdir
+	_task_refcount_file_shadowdir "$db" "$resource"
+	# shadowdir is now set to the location of the shadow directory.
 
-	local shadowdir="${countfile%/*}"
 	# Remove all references and properties.
 	${RM} -f "$shadowdir"/*
 	# Remove the shadow directory.
@@ -204,17 +216,31 @@ _task_refcount_file_add()
 {
 	: ${MV:=mv}
 
-	: ${PKGNAME:=${0##*/}}
-	: ${PKG_DBDIR:=/var/db/pkg}
+	local token=
+	local arg
+	local OPTIND=1
+	while getopts ":t:" arg "$@"; do
+		case $arg in
+		t)	token=${OPTARG} ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
 
 	local db="$1"; shift
 	local resource="$1"; shift
 
-	local countfile
-	_task_refcount_file_countfile "$db" "$resource"
-	# countfile is now set to the location of the count file.
-	local shadowdir="${countfile%/*}"
-	local token="${PKG_DBDIR}/${PKGNAME}"
+	if [ -z "$token" ]; then
+		local pkg_token
+		_task_refcount_file_pkg_token
+		# pkg_token is now set to the package token unique to the system.
+		token=$pkg_token
+	fi
+
+	local shadowdir
+	_task_refcount_file_shadowdir "$db" "$resource"
+	# shadowdir is now set to the location of the shadow directory.
+	local countfile="$shadowdir/${PKGNAME}"
 
 	task_makedir "$shadowdir" 2>/dev/null
 	[ -d "$shadowdir" ] || return 1
@@ -252,17 +278,31 @@ _task_refcount_file_remove()
 	: ${RM:=rm}
 	: ${RMDIR:=rmdir}
 
-	: ${PKGNAME:=${0##*/}}
-	: ${PKG_DBDIR:=/var/db/pkg}
+	local token=
+	local arg
+	local OPTIND=1
+	while getopts ":t:" arg "$@"; do
+		case $arg in
+		t)	token=${OPTARG} ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
 
 	local db="$1"; shift
 	local resource="$1"; shift
 
-	local countfile
-	_task_refcount_file_countfile "$db" "$resource"
-	# countfile is now set to the location of the count file.
-	local shadowdir="${countfile%/*}"
-	local token="${PKG_DBDIR}/${PKGNAME}"
+	if [ -z "$token" ]; then
+		local pkg_token
+		_task_refcount_file_pkg_token
+		# pkg_token is now set to the package token unique to the system.
+		token=$pkg_token
+	fi
+
+	local shadowdir
+	_task_refcount_file_shadowdir "$db" "$resource"
+	# shadowdir is now set to the location of the shadow directory.
+	local countfile="$shadowdir/${PKGNAME}"
 
 	local result=0
 	if [ -f "$countfile" ]; then
@@ -305,18 +345,13 @@ _task_refcount_file_remove()
 
 _task_refcount_file_propfile()
 {
-	: ${PKG_DBDIR:=/var/db/pkg}
-	: ${PKG_REFCOUNT_DBDIR:=${PKG_DBDIR}.refcount}
-
 	local db="$1"; shift
 	local resource="$1"; shift
 	local property="$1"; shift
 
 	local shadowdir
-	case $resource in
-	/*)	shadowdir="${PKG_REFCOUNT_DBDIR}/$db$resource" ;;
-	*)	shadowdir="${PKG_REFCOUNT_DBDIR}/$db/$resource" ;;
-	esac
+	_task_refcount_file_shadowdir "$db" "$resource"
+	# shadowdir is now set to the location of the shadow directory.
 
 	propfile=
 	case $property in
@@ -328,7 +363,6 @@ _task_refcount_file_propfile()
 	+*)	propfile="$shadowdir/$property" ;;
 	*)	propfile="$shadowdir/+$property" ;;
 	esac
-	[ -z "$propfile" ] || propfile="${PKG_DESTDIR}$propfile"
 	# POST-CONDITION:
 	# propfile is set to the location of the property file.
 }
@@ -351,9 +385,6 @@ _task_refcount_file_prop_put()
 {
 	: ${MV:=mv}
 
-	: ${PKGNAME:=${0##*/}}
-	: ${PKG_DBDIR:=/var/db/pkg}
-
 	local db="$1"; shift
 	local resource="$1"; shift
 	local property="$1"; shift
@@ -361,6 +392,10 @@ _task_refcount_file_prop_put()
 	local propfile
 	_task_refcount_file_propfile "$db" "$resource" "$property"
 	# propfile is now set to the location of the property file.
+
+	local pkg_token
+	_task_refcount_file_pkg_token
+	# pkg_token is now set to the package token unique to the system.
 
 	local shadowdir="${propfile%/*}"
 	task_makedir "$shadowdir" 2>/dev/null
@@ -373,12 +408,13 @@ _task_refcount_file_prop_put()
 		task_quote "$temp"
 		temp_quoted=$quoted
 		__task_refcount_file_temps__="$__task_refcount_file_temps__ $temp_quoted"
+		local value
 		if [ $# -gt 0 ]; then
-			echo "$@" > $temp
+			value="$@"
 		else
-			local token="${PKG_DBDIR}/${PKGNAME}"
-			echo "$token" > $temp
+			value=$pkg_token
 		fi
+		echo "$value" > $temp
 		# rename(2) is atomic
 		if ${MV} -f "$temp" "$propfile"; then
 			__task_refcount_file_temps__=${__task_refcount_file_temps__% $temp_quoted}
@@ -396,9 +432,6 @@ _task_refcount_file_prop_put()
 
 _task_refcount_file_prop_match()
 {
-	: ${PKGNAME:=${0##*/}}
-	: ${PKG_DBDIR:=/var/db/pkg}
-
 	local db="$1"; shift
 	local resource="$1"; shift
 	local property="$1"; shift
@@ -407,12 +440,16 @@ _task_refcount_file_prop_match()
 	_task_refcount_file_propfile "$db" "$resource" "$property"
 	# propfile is now set to the location of the property file.
 
+	local pkg_token
+	_task_refcount_file_pkg_token
+	# pkg_token is now set to the package token unique to the system.
+
 	if [ -f "$propfile" ]; then
 		local pattern
 		if [ $# -gt 0 ]; then
 			pattern="$@"
 		else
-			pattern="${PKG_DBDIR}/${PKGNAME}"
+			pattern=$pkg_token
 		fi
 		if task_match -q "$pattern" < $propfile; then
 			return 0
@@ -425,9 +462,6 @@ _task_refcount_file_prop_delete()
 {
 	: ${RM:=rm}
 	: ${RMDIR:=rmdir}
-
-	: ${PKG_DBDIR:=/var/db/pkg}
-	: ${PKG_REFCOUNT_DBDIR:=${PKG_DBDIR}.refcount}
 
 	local db="$1"; shift
 	local resource="$1"; shift
