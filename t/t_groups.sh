@@ -83,7 +83,7 @@ test2()
 	for name in groupG groupH groupI; do
 		if task_group_exists "$name"; then
 			: "success"
-		else	
+		else
 			describe="$describe: missing $name!"
 			return 1
 		fi

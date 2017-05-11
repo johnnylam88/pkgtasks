@@ -142,7 +142,7 @@ test3()
 	if echo "# FILE: \
 		etc/conffile2 c \
 		share/examples/pkg2/conffile2" | task_files check-add; then
-		: "success"	
+		: "success"
 	else
 		describe="$describe: check-add"
 		return 1
@@ -360,7 +360,7 @@ test10()
 	if echo "# FILE: \
 		etc/conffile2 c \
 		share/examples/pkg2/conffile2" | task_files check-add; then
-		: "success"	
+		: "success"
 	else
 		describe="$describe: check-add"
 		return 1
@@ -431,7 +431,7 @@ test12()
 		etc/conffile2 c \
 		share/examples/pkg2/conffile2 \
 		0400 root wheel" | task_files check-add; then
-		: "success"	
+		: "success"
 	else
 		describe="$describe: check-add"
 		return 1
@@ -440,7 +440,7 @@ test12()
 		etc/conffile2 c \
 		share/examples/pkg2/conffile2 \
 		0400 root wheel" | task_files check-perms; then
-		: "success"	
+		: "success"
 	else
 		describe="$describe: check-perms"
 		return 1
@@ -527,7 +527,7 @@ test15()
 	if echo "# FILE: \
 		etc/conffile2 c \
 		share/examples/pkg2/conffile2" | task_files check-add; then
-		: "success"	
+		: "success"
 	else
 		describe="$describe: check-add"
 		return 1
@@ -754,7 +754,7 @@ test22()
 	if echo "# FILE: \
 		etc/conffile2 c \
 		share/examples/pkg2/conffile2" | task_files check-add; then
-		: "success"	
+		: "success"
 	else
 		describe="$describe: check-add"
 		return 1

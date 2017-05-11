@@ -339,7 +339,7 @@ task_files()
 						if [ -f "$d_path" ]; then
 							task_echo "    ! file not removed: $d_path"
 						fi
-						# delete the reference count 
+						# delete the reference count
 						task_refcount delete files "$path"
 					fi
 				else

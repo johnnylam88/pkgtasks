@@ -220,7 +220,7 @@ test15()
 	describe="add: nonexistent group, no groupid"
 	if mock_groupadd "$nonexistent_group"; then
 		: "success"
-	else	
+	else
 		return 1
 	fi
 	return 0

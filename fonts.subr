@@ -299,7 +299,7 @@ _task_fonts_cleanup()
 {
 	: ${RM:=rm}
 	: ${RMDIR:=rmdir}
-	
+
 	eval set -- $__task_fonts_dirs__
 	local fontdir
 	for fontdir; do

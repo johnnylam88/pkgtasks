@@ -313,7 +313,7 @@ task_directories()
 							: "directory already removed"
 						elif [ "$removedir" = "yes" ]; then
 							${RMDIR} -p "$d_path" 2>/dev/null
-						fi	
+						fi
 						# Only warn if the directory is owned by the package.
 						if [ -n "$owned" ]; then
 							if [ -d "$d_path" ]; then

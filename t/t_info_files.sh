@@ -58,7 +58,7 @@ test_destdir_setup()
 	: ${MV:=mv}
 
 	PKG_DESTDIR="${TEST_CURDIR}/destdir"
-	${MKDIR} -p "${PKG_DESTDIR}${PKG_PREFIX}" 
+	${MKDIR} -p "${PKG_DESTDIR}${PKG_PREFIX}"
 	${MV} info "${PKG_DESTDIR}${PKG_PREFIX}"
 }
 

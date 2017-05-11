@@ -35,7 +35,7 @@
 # DESCRIPTION
 #	The task_addgroup function adds a group to the system with the
 #	matching group ID if it is given.
-#	
+#
 #	The task_adduser function adds a user to the system with the
 #	matching user ID if it is given.  The additional parameters to the
 #	task_adduser function can be used to set the group, description,

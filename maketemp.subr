@@ -170,7 +170,7 @@ task_maketemp()
 				: "success"
 			elif [ -z "$quiet" ]; then
 				return 1
-			else	
+			else
 				echo 1>&2 "task_maketemp: error creating file \`\`$name''"
 				return 1
 			fi ;;

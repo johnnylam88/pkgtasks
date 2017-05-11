@@ -45,7 +45,7 @@
 #	"root" and sets the "describe" environment variable to a "skip"
 #	directive.
 #
-#	The task_load_test function sources the test module from the 
+#	The task_load_test function sources the test module from the
 #	${TASK_TESTS_DIR} directory and passes it all of the remaining
 #	parameters.
 #
@@ -278,7 +278,7 @@ _task_tap_line()
 	  0)	testline="ok" ;;
 	  *)	testline="not ok"
 	  esac
-	
+
 	  # Append test number.
 	  case $write_number in
 	  "")	: "don't append number" ;;
