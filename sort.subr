@@ -29,7 +29,7 @@
 #	sort.subr -- sort lines from standard input
 #
 # SYNOPSIS
-#	task_sort [-r]
+#	task_sort [-ru]
 #
 # DESCRIPTION
 #	The task_sort function reads lines from standard input until EOF is
@@ -38,7 +38,8 @@
 #
 #	The options are as follows:
 #
-#	-r	Sort in reverse order.
+#	-r	Reverse: sort in reverse order.
+#	-u	Unique: suppress duplicate lines.
 #
 # RETURN VALUES
 #	Returns 0 on success, and >0 if an error occurs.
@@ -55,12 +56,14 @@ task_sort()
 {
 	: ${AWK:=awk}
 
-	local cmp=">"
+	local cmp="<"
+	local uniq=0
 	local arg
 	local OPTIND=1
-	while getopts ":r" arg "$@"; do
+	while getopts ":ru" arg "$@"; do
 		case $arg in
-		r)	cmp="<" ;;
+		r)	cmp=">" ;;
+		u)	uniq=1 ;;
 		*)	return 127 ;;
 		esac
 	done
@@ -68,16 +71,24 @@ task_sort()
 
 	${AWK} '	{ line[NR] = $0 }
 		END	{ # sort with insertion sort
+			n = 0	# number of duplicates
 			for ( i = 1; i <= NR; i++ ) {
 				value = line[i]
-				j = i - 1
-				while ( j > 0 && line[j] '"$cmp"' value ) {
-					line[j + 1] = line[j]
+				j = i - n - 1
+				while ( j > 0 && value '"$cmp"' line[j] ) {
 					j--
 				}
-				line[j + 1] = value
+				if ( '"$uniq"' > 0 && j > 0 && value == line[j] ) {
+					# duplicate of jth value
+					n++
+				} else {
+					for ( k = i - n - 1; k > j; k-- )
+						line[k+1] = line[k]
+					line[j+1] = value
+				}
 			}
-			for ( i = 1; i <= NR; i++ )
+			for ( i = 1; i <= NR - n; i++ )
 				print line[i]
 		}'
+
 }

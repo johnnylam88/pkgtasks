@@ -35,20 +35,49 @@ test_setup()
 	: ${CMP:=cmp}
 
 	${CAT} > data << EOF
+c
 e
+d
 a
 d
+b
 c
 b
+e
+a
 EOF
 	${CAT} > sorted << EOF
 a
+a
+b
+b
+c
+c
+d
+d
+e
+e
+EOF
+	${CAT} > reversed << EOF
+e
+e
+d
+d
+c
+c
+b
+b
+a
+a
+EOF
+	${CAT} > unique-sorted << EOF
+a
 b
 c
 d
 e
 EOF
-	${CAT} > reversed << EOF
+	${CAT} > unique-reversed << EOF
 e
 d
 c
@@ -89,6 +118,32 @@ test3()
 	task_createfile empty
 	task_sort < empty > output
 	if ${CMP} -s output empty; then
+		: "success"
+	else
+		${CAT} output
+		return 1
+	fi
+	return 0
+}
+
+test4()
+{
+	describe="unique sort"
+	task_sort -u < data > output
+	if ${CMP} -s output unique-sorted; then
+		: "success"
+	else
+		${CAT} output
+		return 1
+	fi
+	return 0
+}
+
+test5()
+{
+	describe="unique reverse-sort"
+	task_sort -ru < data > output
+	if ${CMP} -s output unique-reversed; then
 		: "success"
 	else
 		${CAT} output
