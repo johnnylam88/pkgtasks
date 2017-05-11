@@ -46,9 +46,10 @@
 #	The third field in each line is set of flags with the following
 #	meaning:
 #
-#	    m	directory is created (required)
 #	    f	ignore ${PKG_CONFIG} value
+#	    m	directory is created
 #	    o	directory is owned by the package
+#	    .	placeholder flag to ensure the field is non-empty
 #
 #	The "add" action creates the directory and sets the permissions on
 #	the directory if given.  A reference count for the directory will
@@ -113,6 +114,7 @@ task_load makedir
 task_load permissions
 task_load refcount
 task_load truthy
+task_load valid_options
 
 task_directories()
 {
@@ -147,7 +149,7 @@ task_directories()
 
 	local result line_result
 	local msg
-	local owned makedir changes
+	local owned makedir removedir changes
 	local refcount
 
 	result=0
@@ -160,10 +162,7 @@ task_directories()
 			: "use this line" ;;
 		*)	continue ;;
 		esac
-		case $flags in
-		*m*)	: "make flag is required" ;;
-		*)	continue ;;
-		esac
+		task_valid_options "$flags" "fmo." || continue
 
 		# Canonicalize paths.
 		case $path in
@@ -203,12 +202,24 @@ task_directories()
 
 		makedir=
 		case $flags in
-		*f*)	# "f" always implies make.
-			makedir="yes" ;;
-		*)	# If not "f", then make only if PKG_CONFIG is truthy.
-			if [ -n "$pkg_config" ]; then
-			   	makedir="yes"
-			fi ;;
+		*m*)	makedir="seen"
+			case $flags in
+			*f*)	# "f" always implies makedir.
+				makedir="yes" ;;
+			*)	# otherwise, makedir only if PKG_CONFIG is truthy.
+				[ -z "$pkg_config" ] || makedir="yes" ;;
+			esac ;;
+		esac
+
+		removedir=
+		case $flags in
+		*)	removedir="seen"
+			case $flags in
+			*f*)	# "f" always implies removedir.
+				removedir="yes" ;;
+			*)	# otherwise, removedir only if PKG_CONFIG is truthy.
+				[ -z "$pkg_config" ] || removedir="yes" ;;
+			esac ;;
 		esac
 
 		line_result=0
@@ -224,6 +235,8 @@ task_directories()
 					fi
 					task_echo "    ! directory already exists: $d_path"
 				elif [ -z "$makedir" ]; then
+					: "directory is never created"
+				elif [ "$makedir" = "seen" ]; then
 					task_echo "    ! directory creation skipped: $d_path"
 				elif task_makedir "$d_path"; then
 					task_echo "    > directory created: $d_path"
@@ -249,7 +262,7 @@ task_directories()
 		check-add)
 			if [ -d "$d_path" ]; then
 				: "directory already exists"
-			else
+			elif [ -n "$makedir" ]; then
 				task_echo "!!! INFO: ${PKGNAME}: Create directory: $msg"
 				line_result=1
 			fi ;;
@@ -298,7 +311,7 @@ task_directories()
 							: "directory is preexisting"
 						elif [ ! -d "$d_path" ]; then
 							: "directory already removed"
-						elif [ -n "$makedir" ]; then
+						elif [ "$removedir" = "yes" ]; then
 							${RMDIR} -p "$d_path" 2>/dev/null
 						fi	
 						# Only warn if the directory is owned by the package.
@@ -322,7 +335,7 @@ task_directories()
 					: "refcount is not zero"
 				elif [ ! -d "$d_path" ]; then
 					: "directory already removed"
-				elif [ -n "$owned" ]; then
+				elif [ -n "$removedir" -a -n "$owned" ]; then
 					# Only warn if the directory is owned by the package.
 					task_echo "!!! INFO: ${PKGNAME}: Remove directory: $d_path"
 					line_result=1

@@ -46,9 +46,10 @@
 #	The third field in each line is set of flags with the following
 #	meaning:
 #
-#	    c	file is copied into place (required)
+#	    c	file is copied into place
 #	    f	ignore ${PKG_CONFIG} value
 #	    r	file is an rc.d script (consider ${PKG_RCD_SCRIPTS})
+#	    .   placeholder flag to ensure the field is non-empty
 #
 #	The "add" action copies the source path to the target path if the
 #	target path doesn't exist and sets the permissions on the path if
@@ -122,6 +123,7 @@ task_load echo
 task_load permissions
 task_load refcount
 task_load truthy
+task_load valid_options
 
 task_files()
 {
@@ -160,7 +162,7 @@ task_files()
 
 	local result line_result
 	local msg
-	local copy changes
+	local copy remove changes
 	local refcount
 
 	result=0
@@ -173,10 +175,7 @@ task_files()
 			: "use this line" ;;
 		*)	continue ;;
 		esac
-		case $flags in
-		*c*)	: "copy flag is required" ;;
-		*)	continue ;;
-		esac
+		task_valid_options "$flags" "cfr." || continue
 
 		# Canonicalize paths.
 		case $path in
@@ -205,16 +204,36 @@ task_files()
 
 		copy=
 		case $flags in
-		*f*)	# "f" always implies copy.
-			copy="yes" ;;
-		*r*)	# "r" implies if PKG_CONFIG and PKG_RCD_SCRIPTS are both truthy.
-			if [ -n "$pkg_config" -a -n "$pkg_rcd_scripts" ]; then
-			   	copy="yes"
-			fi ;;
-		*)	# if not "f" or "r", then copy if PKG_CONFIG is truthy.
-			if [ -n "$pkg_config" ]; then
-			   	copy="yes"
-			fi ;;
+		*c*)	copy="seen"
+			case $flags in
+			*f*)	# "f" always implies copy.
+				copy="yes" ;;
+			*r*)	# "r" implies if PKG_CONFIG and PKG_RCD_SCRIPTS are both truthy.
+				if [ -n "$pkg_config" -a -n "$pkg_rcd_scripts" ]; then
+					copy="yes"
+				fi ;;
+			*)	# otherwise, copy if PKG_CONFIG is truthy.
+				if [ -n "$pkg_config" ]; then
+					copy="yes"
+				fi ;;
+			esac ;;
+		esac
+
+		remove=
+		case $flags in
+		*)	remove="seen"
+			case $flags in
+			*f*)	# "f" always implies remove.
+				remove="yes" ;;
+			*r*)	# "r" implies if PKG_CONFIG and PKG_RCD_SCRIPTS are both truthy.
+				if [ -n "$pkg_config" -a -n "$pkg_rcd_scripts" ]; then
+					remove="yes"
+				fi ;;
+			*)	# otherwise, remove if PKG_CONFIG is truthy.
+				if [ -n "$pkg_config" ]; then
+					remove="yes"
+				fi ;;
+			esac ;;
 		esac
 
 		line_result=0
@@ -232,6 +251,8 @@ task_files()
 				elif [ -f "$egfile" -o -c "$egfile" ]; then
 					# Example file exists.
 					if [ -z "$copy" ]; then
+						: "file is never copied"
+					elif [ "$copy" = "seen" ]; then
 						task_echo "    ! file copy skipped: $d_path"
 					elif ${CP} "$egfile" "$d_path"; then
 						task_echo "    > file copied: $d_path"
@@ -253,6 +274,8 @@ task_files()
 		check-add)
 			if [ -f "$d_path" ]; then
 				: "file already exists"
+			elif [ -z "$copy" ]; then
+				: "file is never copied"
 			elif [ -f "$egfile" -o -c "$egfile" ]; then
 				task_echo "!!! INFO: ${PKGNAME}: Create file: $msg [$egfile]"
 				line_result=1
@@ -302,7 +325,7 @@ task_files()
 						   	: "file already removed"
 						elif [ -f "$egfile" -o -c "$egfile" ]; then
 							if task_compare "$d_path" "$egfile"; then
-								if [ -n "$copy" ]; then
+								if [ "$remove" = "yes" ]; then
 									if ${RM} -f "$d_path"; then
 										task_echo "    > file removed: $d_path"
 									else
@@ -329,7 +352,7 @@ task_files()
 					: "refcount is not zero"
 				elif [ ! -f "$d_path" ]; then
 					: "file already removed"
-				else
+				elif [ -n "$remove" ]; then
 					task_echo "!!! INFO: ${PKGNAME}: Remove file: $d_path"
 					line_result=1
 				fi

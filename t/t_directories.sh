@@ -80,6 +80,27 @@ test1()
 
 test2()
 {
+	describe="skip make dir"
+	if echo "# DIR: etc/pkg1 ." | task_directories add; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# DIR: etc/pkg1 ." | task_directories check-add; then
+		: "success"
+	else
+		describe="$describe: check-add"
+		return 1
+	fi
+	if [ -d "${PKG_PREFIX}/etc/pkg1" ]; then
+		describe="$describe: dir exists!"
+		return 1
+	fi
+	return 0
+}
+
+test3()
+{
 	describe="remove make dir"
 	echo "# DIR: etc/pkg1 m" | task_directories add
 	if echo "# DIR: etc/pkg1 m" | task_directories remove; then
@@ -104,7 +125,52 @@ test2()
 	return 0
 }
 
-test3()
+test4()
+{
+	describe="remove skipped make dir"
+	echo "# DIR: etc/pkg1 ." | task_directories add
+	if echo "# DIR: etc/pkg1 ." | task_directories remove; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# DIR: etc/pkg1 ." | task_directories check-remove; then
+		: "success"
+	else
+		describe="$describe: check-remove"
+		return 1
+	fi
+	if [ -d "${PKG_PREFIX}/etc/pkg1" ]; then
+		describe="$describe: dir exists!"
+		return 1
+	fi
+	return 0
+}
+
+test5()
+{
+	describe="remove skipped made dir"
+	echo "# DIR: etc/pkg1 ." | task_directories add
+	${MKDIR} -p etc/pkg1
+	if echo "# DIR: etc/pkg1 ." | task_directories remove; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# DIR: etc/pkg1 ." | task_directories check-remove; then
+		: "success"
+	else
+		describe="$describe: check-remove"
+		return 1
+	fi
+	if [ -d "${PKG_PREFIX}/etc/pkg1" ]; then
+		describe="$describe: dir exists!"
+		return 1
+	fi
+	return 0
+}
+
+test6()
 {
 	describe="make dir for 2 packages"
 	( PKGNAME="package1"
@@ -124,7 +190,7 @@ test3()
 	return 0
 }
 
-test4()
+test7()
 {
 	describe="remove after make dir for 2 packages"
 	( PKGNAME="package1"
@@ -146,7 +212,7 @@ test4()
 	return 0
 }
 
-test5()
+test8()
 {
 	describe="remove owned directory"
 	echo "# DIR: etc/pkg1 mo" | task_directories add
@@ -158,7 +224,7 @@ test5()
 	return 0
 }
 
-test6()
+test9()
 {
 	describe="conflicting owner"
 	( PKGNAME="package1"
@@ -171,7 +237,7 @@ test6()
 	return 0
 }
 
-test7()
+test10()
 {
 	describe="remove owned directory used by another package"
 	( PKGNAME="package1"
@@ -186,7 +252,7 @@ test7()
 	return 0
 }
 
-test8()
+test11()
 {
 	describe="owned dir with permissions"
 	task_requires_root && return 0
@@ -216,7 +282,7 @@ test8()
 	fi
 }
 
-test9()
+test12()
 {
 	describe="make dir with PKG_DESTDIR"
 	test_destdir_setup
@@ -244,7 +310,29 @@ test9()
 	return 0
 }
 
-test10()
+test13()
+{
+	describe="skip make dir with PKG_DESTDIR"
+	test_destdir_setup
+	if echo "# DIR: etc/pkg1 ." | task_directories add; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# DIR: etc/pkg1 ." | task_directories check-add; then
+		: "success"
+	else
+		describe="$describe: check-add"
+		return 1
+	fi
+	if [ -d "${PKG_DESTDIR}${PKG_PREFIX}/etc/pkg1" ]; then
+		describe="$describe: dir exists!"
+		return 1
+	fi
+	return 0
+}
+
+test14()
 {
 	describe="remove make dir with PKG_DESTDIR"
 	test_destdir_setup
@@ -266,6 +354,30 @@ test10()
 	fi
 	if task_refcount exists dirs "${PKG_PREFIX}/etc/pkg1"; then
 		describe="$describe: refcount exists!"
+		return 1
+	fi
+	return 0
+}
+
+test15()
+{
+	describe="remove skipped made dir with PKG_DESTDIR"
+	test_destdir_setup
+	echo "# DIR: etc/pkg1 ." | task_directories add
+	${MKDIR} -p ${PKG_DESTDIR}${PKG_PREFIX}/etc/pkg1
+	if echo "# DIR: etc/pkg1 ." | task_directories remove; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# DIR: etc/pkg1 ." | task_directories check-remove; then
+		: "success"
+	else
+		describe="$describe: check-remove"
+		return 1
+	fi
+	if [ -d "${PKG_DESTDIR}${PKG_PREFIX}/etc/pkg1" ]; then
+		describe="$describe: dir exists!"
 		return 1
 	fi
 	return 0

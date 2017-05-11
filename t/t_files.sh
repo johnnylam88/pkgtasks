@@ -68,7 +68,11 @@ test_destdir_setup()
 
 	PKG_DESTDIR="${TEST_CURDIR}/destdir"
 	${MKDIR} -p "${PKG_DESTDIR}${PKG_PREFIX}"
-	${MV} etc share unwriteable var "${PKG_DESTDIR}${PKG_PREFIX}"
+	${MV} etc share var "${PKG_DESTDIR}${PKG_PREFIX}"
+
+	# Unwriteable directory.
+	${MKDIR} -p "${PKG_DESTDIR}${PKG_PREFIX}/unwriteable"
+	${CHMOD} 0400 "${PKG_DESTDIR}${PKG_PREFIX}/unwriteable"
 }
 
 test1()
@@ -158,6 +162,37 @@ test3()
 
 test4()
 {
+	describe="skip copy"
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files add; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files check-add; then
+		: "success"
+	else
+		describe="$describe: check-add"
+		return 1
+	fi
+	if [ -f "${PKG_PREFIX}/etc/conffile2" ]; then
+		describe="$describe: file exists!"
+		return 1
+	fi
+	if task_refcount exists files "${PKG_PREFIX}/etc/conffile2"; then
+		: "success"
+	else
+		describe="$describe: refcount missing!"
+		return 1
+	fi
+	return 0
+}
+
+test5()
+{
 	describe="copy rc.d script"
 	if echo "# FILE: \
 		etc/rc.d/conffile2 cr \
@@ -179,7 +214,7 @@ test4()
 	return 0
 }
 
-test5()
+test6()
 {
 	describe="remove after copy"
 	echo "# FILE: \
@@ -211,7 +246,42 @@ test5()
 	return 0
 }
 
-test6()
+test7()
+{
+	: ${CP:=cp}
+
+	describe="remove after skipped but copied"
+	echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files add
+	${CP} share/examples/pkg2/conffile2 etc/conffile2
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files remove; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files check-remove; then
+		: "success"
+	else
+		describe="$describe: check-remove"
+		return 1
+	fi
+	if [ -f "${PKG_PREFIX}/etc/conffile2" ]; then
+		describe="$describe: file exists!"
+		return 1
+	fi
+	if task_refcount exists files "${PKG_PREFIX}/etc/conffile2"; then
+		describe="$describe: refcount exists!"
+		return 1
+	fi
+	return 0
+}
+
+test8()
 {
 	describe="remove after modification"
 	echo "# FILE: \
@@ -242,7 +312,41 @@ test6()
 	return 0
 }
 
-test7()
+test9()
+{
+	: ${CP:=cp}
+
+	describe="remove after skipped but copied and modification"
+	echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files add
+	${CP} share/examples/pkg2/conffile2 etc/conffile2
+	echo "extra line" >> "${PKG_PREFIX}/etc/conffile2"
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files remove; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files check-remove; then
+		describe="$describe: check-remove"
+		return 1
+	fi
+	if [ ! -f "${PKG_PREFIX}/etc/conffile2" ]; then
+		describe="$describe: file missing!"
+		return 1
+	fi
+	if task_refcount exists files "${PKG_PREFIX}/etc/conffile2"; then
+		describe="$describe: refcount exists!"
+		return 1
+	fi
+	return 0
+}
+
+test10()
 {
 	describe="copy with preexisting"
 	task_createfile etc/conffile2
@@ -280,7 +384,7 @@ test7()
 	return 0
 }
 
-test8()
+test11()
 {
 	describe="remove after copy with preexisting"
 	task_createfile etc/conffile2
@@ -311,7 +415,7 @@ test8()
 	return 0
 }
 
-test9()
+test12()
 {
 	describe="copy with permissions"
 	task_requires_root && return 0
@@ -353,7 +457,7 @@ test9()
 	fi
 }
 
-test10()
+test13()
 {
 	describe="missing example file with PKG_DESTDIR"
 	test_destdir_setup
@@ -381,7 +485,7 @@ test10()
 	return 0
 }
 
-test11()
+test14()
 {
 	describe="missing target directory with PKG_DESTDIR"
 	test_destdir_setup
@@ -409,7 +513,7 @@ test11()
 	return 0
 }
 
-test12()
+test15()
 {
 	describe="copy with PKG_DESTDIR"
 	test_destdir_setup
@@ -441,7 +545,39 @@ test12()
 	return 0
 }
 
-test4()
+test16()
+{
+	describe="skip copy with PKG_DESTDIR"
+	test_destdir_setup
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files add; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files check-add; then
+		: "success"
+	else
+		describe="$describe: check-add"
+		return 1
+	fi
+	if [ -f "${PKG_DESTDIR}${PKG_PREFIX}/etc/conffile2" ]; then
+		describe="$describe: file exists!"
+		return 1
+	fi
+	if task_refcount exists files "${PKG_PREFIX}/etc/conffile2"; then
+		: "success"
+	else
+		describe="$describe: refcount missing!"
+		return 1
+	fi
+	return 0
+}
+
+test17()
 {
 	describe="copy rc.d script with PKG_DESTDIR"
 	test_destdir_setup
@@ -465,7 +601,7 @@ test4()
 	return 0
 }
 
-test5()
+test18()
 {
 	describe="remove after copy with PKG_DESTDIR"
 	test_destdir_setup
@@ -498,7 +634,44 @@ test5()
 	return 0
 }
 
-test6()
+test19()
+{
+	: ${CP:=cp}
+
+	describe="remove after skipped but copied with PKG_DESTDIR"
+	test_destdir_setup
+	echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files add
+	${CP} ${PKG_DESTDIR}${PKG_PREFIX}/share/examples/pkg2/conffile2 \
+		${PKG_DESTDIR}${PKG_PREFIX}/etc/conffile2
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files remove; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files check-remove; then
+		: "success"
+	else
+		describe="$describe: check-remove"
+		return 1
+	fi
+	if [ -f "${PKG_DESTDIR}${PKG_PREFIX}/etc/conffile2" ]; then
+		describe="$describe: file exists!"
+		return 1
+	fi
+	if task_refcount exists files "${PKG_PREFIX}/etc/conffile2"; then
+		describe="$describe: refcount exists!"
+		return 1
+	fi
+	return 0
+}
+
+test20()
 {
 	describe="remove after modification with PKG_DESTDIR"
 	test_destdir_setup
@@ -530,7 +703,43 @@ test6()
 	return 0
 }
 
-test7()
+test21()
+{
+	: ${CP:=cp}
+
+	describe="remove after skipped but copied and modification with PKG_DESTDIR"
+	test_destdir_setup
+	echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files add
+	${CP} ${PKG_DESTDIR}${PKG_PREFIX}/share/examples/pkg2/conffile2 \
+		${PKG_DESTDIR}${PKG_PREFIX}/etc/conffile2
+	echo "extra line" >> "${PKG_DESTDIR}${PKG_PREFIX}/etc/conffile2"
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files remove; then
+		: "success"
+	else
+		return 1
+	fi
+	if echo "# FILE: \
+		etc/conffile2 . \
+		share/examples/pkg2/conffile2" | task_files check-remove; then
+		describe="$describe: check-remove"
+		return 1
+	fi
+	if [ ! -f "${PKG_DESTDIR}${PKG_PREFIX}/etc/conffile2" ]; then
+		describe="$describe: file missing!"
+		return 1
+	fi
+	if task_refcount exists files "${PKG_PREFIX}/etc/conffile2"; then
+		describe="$describe: refcount exists!"
+		return 1
+	fi
+	return 0
+}
+
+test22()
 {
 	describe="copy with preexisting with PKG_DESTDIR"
 	test_destdir_setup
