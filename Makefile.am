@@ -84,6 +84,7 @@ dist_pkgdata_DATA += usergroup_NetBSD.subr
 dist_pkgdata_DATA += usergroup_exists.subr
 dist_pkgdata_DATA += usergroup_mock.subr
 dist_pkgdata_DATA += users.subr
+dist_pkgdata_DATA += valid_options.subr
 dist_pkgdata_DATA += which.subr
 
 pkgdata_DATA = version.subr
@@ -386,6 +387,14 @@ EXTRA_DIST += t/t_users.sh
 t/t_users: t/t_users.sh $(builddir)/t/build_test
 	-$(MKDIR_P) $(builddir)/t
 	$(AM_V_GEN)target="$(builddir)/t/t_users" source="$(srcdir)/t/t_users.sh"; \
+	$(BUILD_TEST)
+
+pkgtests_SCRIPTS += t/t_valid_options
+CLEANFILES += t/t_valid_options
+EXTRA_DIST += t/t_valid_options.sh
+t/t_valid_options: t/t_valid_options.sh $(builddir)/t/build_test
+	-$(MKDIR_P) $(builddir)/t
+	$(AM_V_GEN)target="$(builddir)/t/t_valid_options" source="$(srcdir)/t/t_valid_options.sh"; \
 	$(BUILD_TEST)
 
 pkgtests_SCRIPTS += t/t_version
