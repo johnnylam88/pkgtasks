@@ -2,6 +2,23 @@ Package Tasks
 =============
 
 
+Changes in version 1.3
+----------------------
+
+* Generalized refcount API so the refcount-file implementation
+  may be deprecated in the future.
+
+* Added option to suppress duplicate lines to the `sort` task.
+
+* Added `valid_options` task to simplify checking for valid flags.
+
+* Added `function` task as a generic hook for user-written tasks
+  into the `preinstall`, `postinstall`, `preremove`, and
+  `postremove` meta-tasks.
+
+* Bug fixes.
+
+
 Changes in version 1.2
 ----------------------
 **Released on 2017-05-07.**
