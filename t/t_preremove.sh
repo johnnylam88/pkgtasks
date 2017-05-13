@@ -54,6 +54,7 @@ task_info_files()
 test1()
 {
 	describe="files fail"
+	TASK_FILES_SUCCESS="no"
 	if task_preremove "$datafile"; then
 		: "success"
 	else
@@ -65,6 +66,7 @@ test1()
 test2()
 {
 	describe="info_files fail"
+	TASK_INFO_FILES_SUCCESS="no"
 	if task_preremove "$datafile"; then
 		: "success"
 	else
