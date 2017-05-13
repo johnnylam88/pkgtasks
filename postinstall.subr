@@ -65,6 +65,7 @@ task_load permissions
 task_load shells
 task_load shlibs
 task_load sort
+task_load taskfunc
 
 task_postinstall()
 {
@@ -88,15 +89,18 @@ task_postinstall()
 	post_actions="$post_actions task_info_files"
 	# Update OCaml module run-time library search path database.
 	post_actions="$post_actions task_ocaml_findlib"
+	# Run generic package tasks.
+	post_actions="$post_actions task_function"
 
 	# Seed checks with actions from preinstall, in order.
 	local post_checks="task_directories"
 
 	local result=0
+	local stage="postinstall"
 
 	local post_fn
 	for post_fn in $post_actions; do
-		if $post_fn add < $datafile; then
+		if $post_fn add $stage < $datafile; then
 			: "success"
 		else
 			post_checks="$post_checks $post_fn"
@@ -112,8 +116,8 @@ task_postinstall()
 		case $post_fn in
 		task_directories)
 			# Sort
-			task_sort < $datafile | $post_fn check-add ;;
-		*)	$post_fn check-add < $datafile ;;
+			task_sort < $datafile | $post_fn check-add $stage ;;
+		*)	$post_fn check-add $stage < $datafile ;;
 		esac
 	done
 

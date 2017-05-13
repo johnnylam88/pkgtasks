@@ -64,6 +64,7 @@ task_load ocaml_findlib
 task_load shells
 task_load shlibs
 task_load sort
+task_load taskfunc
 task_load users
 
 task_postremove()
@@ -88,19 +89,22 @@ task_postremove()
 	post_actions="$post_actions task_users"
 	# Remove unused groups.
 	post_actions="$post_actions task_groups"
+	# Run generic package tasks.
+	post_actions="$post_actions task_function"
 
 	# Seed checks with actions from preremove, in order.
 	local post_checks="task_info_files task_files"
 
 	local result=0
+	local stage="preinstall"
 
 	local post_fn
 	for post_fn in $post_actions; do
 		case $post_fn in
 		task_directories)
 			# Reverse-sort.
-			task_sort -r < $datafile | $post_fn remove ;;
-		*)	$post_fn remove < $datafile ;;
+			task_sort -r < $datafile | $post_fn remove $stage ;;
+		*)	$post_fn remove $stage < $datafile ;;
 		esac
 		if [ $? -gt 0 ]; then
 			# Any errors during postremove are non-fatal.
@@ -117,8 +121,8 @@ task_postremove()
 		case $post_fn in
 		task_directories)
 			# Reverse-sort.
-			task_sort -r < $datafile | $post_fn check-remove ;;
-		*)	$post_fn check-remove < $datafile ;;
+			task_sort -r < $datafile | $post_fn check-remove $stage ;;
+		*)	$post_fn check-remove $stage < $datafile ;;
 		esac
 	done
 

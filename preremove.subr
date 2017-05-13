@@ -52,6 +52,7 @@ __task_preremove__="yes"
 
 task_load files
 task_load info_files
+task_load taskfunc
 
 task_preremove()
 {
@@ -60,19 +61,29 @@ task_preremove()
 
 	[ -f "$datafile" ] || return 1
 
+	local stage="preinstall"
+
 	# Unregistering a GNU info files requires reading the file to find
 	# all nodes listed in the file, so it must be done before the file
 	# is removed.  Any errors in unregistering GNU info files are
 	# non-fatal.
 	#
-	task_info_files remove < $datafile
+	task_info_files remove $stage < $datafile
 
 	# Removing a configuration file requires comparing it to the
 	# example file from which it was copied, so it must be done before
 	# the example file is removed.  Any errors in removing
 	# configuration files are non-fatal.
 	#
-	task_files remove < $datafile
+	task_files remove $stage < $datafile
+
+	# Run the generic package tasks.
+	if task_sort -r $datafile | task_function remove $stage; then
+		: "success"
+	else
+		# Errors from the generic package tasks are fatal.
+		return 1
+	fi
 
 	return 0
 }

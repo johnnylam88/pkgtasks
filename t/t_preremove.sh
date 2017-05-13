@@ -35,6 +35,7 @@ test_setup()
 	task_createfile "$datafile"
 
 	TASK_FILES_SUCCESS="yes"
+	TASK_FUNCTION_SUCCESS="yes"
 	TASK_INFO_FILES_SUCCESS="yes"
 }
 
@@ -42,6 +43,11 @@ test_setup()
 task_files()
 {
 	[ "${TASK_FILES_SUCCESS}" = "yes" ]
+}
+
+task_function()
+{
+	[ "${TASK_FUNCTION_SUCCESS}" = "yes" ]
 }
 
 task_info_files()
@@ -65,6 +71,16 @@ test1()
 
 test2()
 {
+	describe="function fail"
+	TASK_FUNCTION_SUCCESS="no"
+	if task_preremove "$datafile"; then
+		return 1
+	fi
+	return 0
+}
+
+test3()
+{
 	describe="info_files fail"
 	TASK_INFO_FILES_SUCCESS="no"
 	if task_preremove "$datafile"; then
@@ -75,7 +91,7 @@ test2()
 	return 0
 }
 
-test3()
+test4()
 {
 	describe="all succeed"
 	if task_preremove "$datafile"; then

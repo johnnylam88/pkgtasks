@@ -37,6 +37,7 @@ test_setup()
 	TASK_DIRECTORIES_SUCCESS="yes"
 	TASK_FILES_SUCCESS="yes"
 	TASK_FONTS_SUCCESS="yes"
+	TASK_FUNCTION_SUCCESS="yes"
 	TASK_GROUPS_SUCCESS="yes"
 	TASK_INFO_FILES_SUCCESS="yes"
 	TASK_OCAML_FINDLIB_SUCCESS="yes"
@@ -59,6 +60,11 @@ task_files()
 task_fonts()
 {
 	[ "${TASK_FONTS_SUCCESS}" = "yes" ]
+}
+
+task_function()
+{
+	[ "${TASK_FUNCTION_SUCCESS}" = "yes" ]
 }
 
 task_groups()
@@ -127,6 +133,16 @@ test3()
 
 test4()
 {
+	describe="function fail"
+	TASK_FUNCTION_SUCCESS="no"
+	if task_postremove "$datafile"; then
+		return 1
+	fi
+	return 0
+}
+
+test5()
+{
 	describe="groups fail"
 	TASK_GROUPS_SUCCESS="no"
 	if task_postremove "$datafile"; then
@@ -135,7 +151,7 @@ test4()
 	return 0
 }
 
-test5()
+test6()
 {
 	describe="info_files fail"
 	TASK_INFO_FILES_SUCCESS="no"
@@ -147,7 +163,7 @@ test5()
 	return 0
 }
 
-test6()
+test7()
 {
 	describe="ocaml_findlib fail"
 	TASK_OCAML_FINDLIB_SUCCESS="no"
@@ -157,7 +173,7 @@ test6()
 	return 0
 }
 
-test7()
+test8()
 {
 	describe="shells fail"
 	TASK_SHELLS_SUCCESS="no"
@@ -167,7 +183,7 @@ test7()
 	return 0
 }
 
-test8()
+test9()
 {
 	describe="shlibs fail"
 	TASK_SHLIBS_SUCCESS="no"
@@ -177,7 +193,7 @@ test8()
 	return 0
 }
 
-test9()
+test10()
 {
 	describe="users fail"
 	TASK_USERS_SUCCESS="no"
@@ -187,7 +203,7 @@ test9()
 	return 0
 }
 
-test10()
+test11()
 {
 	describe="all succeed"
 	if task_postremove "$datafile"; then

@@ -35,6 +35,7 @@ test_setup()
 	task_createfile "$datafile"
 
 	TASK_DIRECTORIES_SUCCESS="yes"
+	TASK_FUNCTION_SUCCESS="yes"
 	TASK_GROUPS_SUCCESS="yes"
 	TASK_USERS_SUCCESS="yes"
 }
@@ -43,6 +44,11 @@ test_setup()
 task_directories()
 {
 	[ "${TASK_DIRECTORIES_SUCCESS}" = "yes" ]
+}
+
+task_function()
+{
+	[ "${TASK_FUNCTION_SUCCESS}" = "yes" ]
 }
 
 task_groups()
@@ -54,8 +60,6 @@ task_users()
 {
 	[ "${TASK_USERS_SUCCESS}" = "yes" ]
 }
-
-# Only succeed if adding both groups and users are successful.
 
 test1()
 {
@@ -71,6 +75,16 @@ test1()
 
 test2()
 {
+	describe="function fail"
+	TASK_FUNCTION_SUCCESS="no"
+	if task_preinstall "$datafile"; then
+		return 1
+	fi
+	return 0
+}
+
+test3()
+{
 	describe="groups fail"
 	TASK_GROUPS_SUCCESS="no"
 	if task_preinstall "$datafile"; then
@@ -79,7 +93,7 @@ test2()
 	return 0
 }
 
-test3()
+test4()
 {
 	describe="users fail"
 	TASK_USERS_SUCCESS="no"
@@ -89,7 +103,7 @@ test3()
 	return 0
 }
 
-test4()
+test5()
 {
 	describe="all succeed"
 	if task_preinstall "$datafile"; then
