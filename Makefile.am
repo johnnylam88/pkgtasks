@@ -74,6 +74,7 @@ dist_pkgdata_DATA += say.subr
 dist_pkgdata_DATA += shells.subr
 dist_pkgdata_DATA += shlibs.subr
 dist_pkgdata_DATA += sort.subr
+dist_pkgdata_DATA += taskfunc.subr
 dist_pkgdata_DATA += truthy.subr
 dist_pkgdata_DATA += unittest.subr
 dist_pkgdata_DATA += usergroup.subr
@@ -315,6 +316,14 @@ EXTRA_DIST += t/t_sort.sh
 t/t_sort: t/t_sort.sh $(builddir)/t/build_test
 	-$(MKDIR_P) $(builddir)/t
 	$(AM_V_GEN)target="$(builddir)/t/t_sort" source="$(srcdir)/t/t_sort.sh"; \
+	$(BUILD_TEST)
+
+pkgtests_SCRIPTS += t/t_taskfunc
+CLEANFILES += t/t_taskfunc
+EXTRA_DIST += t/t_taskfunc.sh
+t/t_taskfunc: t/t_taskfunc.sh $(builddir)/t/build_test
+	-$(MKDIR_P) $(builddir)/t
+	$(AM_V_GEN)target="$(builddir)/t/t_taskfunc" source="$(srcdir)/t/t_taskfunc.sh"; \
 	$(BUILD_TEST)
 
 pkgtests_SCRIPTS += t/t_truthy

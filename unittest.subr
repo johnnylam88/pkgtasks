@@ -29,8 +29,6 @@
 #	unittest.subr -- run unit tests and produce TAP output
 #
 # SYNOPSIS
-#	task_is_function <value>
-#
 #	task_requires_root
 #
 #	task_load_test <test_module> ...
@@ -38,9 +36,6 @@
 #	task_run_tests [-q] [<n>]
 #
 # DESCRIPTION
-#	The task_is_function function checks whether <value> is a shell
-#	function defined in the current environment.
-#
 #	The task_requires_root function checks whether the the user is
 #	"root" and sets the "describe" environment variable to a "skip"
 #	directive.
@@ -72,9 +67,6 @@
 #	is called.
 #
 # RETURN VALUES
-#	The task_is_function function returns 0 if the value is a shell
-#	function, and >0 otherwise.
-#
 #	The task_load_test function returns 0 on success, and >0 if an
 #	error occurs.
 #
@@ -114,18 +106,9 @@
 
 __task_unittest__="yes"
 
+task_load taskfunc	# task_is_function
 task_load maketemp
 task_load say
-
-task_is_function()
-{
-	type "$1" | while read line; do
-		case $line in
-		*" function") return 0 ;;
-		esac
-		return 1
-	done
-}
 
 task_requires_root()
 {
