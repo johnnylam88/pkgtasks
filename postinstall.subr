@@ -111,8 +111,8 @@ task_postinstall()
 	for post_fn in $post_checks; do
 		case $post_fn in
 		task_directories)
-			# Reverse-sort.
-			task_sort -r < $datafile | $post_fn check-add ;;
+			# Sort
+			task_sort < $datafile | $post_fn check-add ;;
 		*)	$post_fn check-add < $datafile ;;
 		esac
 	done
