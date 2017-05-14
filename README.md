@@ -26,7 +26,7 @@ same entry more than once.
 Getting sources
 ---------------
 
-The latest version of *pkgtasks* is 1.2 and was released on May 7th, 2017.
+The latest version of *pkgtasks* is 1.3 and was released on May 13th, 2017.
 
 See the [release notes](NEWS.md) for information about the changes in this
 and all previous releases.
@@ -62,7 +62,7 @@ The individual package tasks supported by *pkgtasks* are:
 These package tasks support `${PKG_DESTDIR}` to manipulate the correct
 filesystem paths for a destdir-installed package.
 
-For convenience, these have been composed into larger tasks:
+For convenience, these have been composed into larger meta-tasks:
 
   * `preinstall`: tasks performed before files are installed
   * `preremove`: tasks performed before files are removed
@@ -85,7 +85,10 @@ scripts:
   * `random`: generate random numbers (badly)
   * `refcount`: reference-count system resources
   * `say`: write to standard output with a tag
+  * `sort`: sort lines from standard input
+  * `taskfunc`: generic function hook for meta-tasks
   * `truthy`: evaluate truthiness
+  * `valid_options`: check validity of option strings
   * `version`: compare version strings
   * `which`: locate a program file in the $PATH
 
