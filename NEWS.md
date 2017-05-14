@@ -4,6 +4,7 @@ Package Tasks
 
 Changes in version 1.3
 ----------------------
+**Released on 2017-05-13.**
 
 * Generalized refcount API so the refcount-file implementation
   may be deprecated in the future.
