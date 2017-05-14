@@ -163,7 +163,7 @@ task_info_files()
 					task_echo "    ! info file not unregistered: $file"
 				fi
 			else
-				task_echo "   > info file already unregistered: $file"
+				task_echo "    > info file already unregistered: $file"
 			fi ;;
 		esac
 		[ $line_result -eq 0 ] || result=1
@@ -186,9 +186,14 @@ _task_info_files_cleanup()
 		# Check if the "dir" file has any entries and
 		# remove it if it doesn't.
 		#
-		task_match -v "[*][ 	][mM]enu:*" < $index |
-		task_match -q '[*][ 	]*' || ${RM} -f "$index"
-		${RMDIR} -p "${index%/*}" 2>/dev/null
+		if task_match -v "[*][ 	][mM]enu:*" < $index |
+		   task_match -q '[*][ 	]*'; then
+			: "entries exist"
+		else
+			${RM} -f "$index"
+			${RMDIR} -p "${index%/*}" 2>/dev/null
+			task_echo "    > empty dir file removed: $index"
+		fi
 	done
 	__task_info_files_indices__=
 }

@@ -326,6 +326,7 @@ _task_fonts_cleanup()
 				"$fontdir/fonts.scale" \
 				"$fontdir/Fontmap"*
 			${RMDIR} -p "$fontdir" 2>/dev/null
+			task_echo "    > empty fonts directory removed: $fontdir"
 		fi
 	done
 	__task_fonts_dirs__=
