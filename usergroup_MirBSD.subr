@@ -76,6 +76,7 @@
 
 __task_usergroup_MirBSD__="yes"
 
+task_load echo
 task_load lock
 task_load quote
 
@@ -475,7 +476,7 @@ _platform_addgroup_cleanup()
 		case ${dir##*/} in
 		*.tmp.*)
 			${RM} -fr "$dir" ;;
-		*)	echo "!!! WARNING: usergroup: Remove directory $dir"
+		*)	task_echo "!!! WARNING: usergroup: Remove directory $dir" ;;
 		esac
 	done
 	__platform_addgroup_dirs__=
@@ -502,7 +503,7 @@ _platform_adduser_cleanup()
 		case ${dir##*/} in
 		*.tmp.*)
 			${RM} -fr "$dir" ;;
-		*)	echo "!!! WARNING: usergroup: Remove directory $dir"
+		*)	task_echo "!!! WARNING: usergroup: Remove directory $dir" ;;
 		esac
 	done
 	__platform_adduser_dirs__=
