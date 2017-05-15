@@ -40,7 +40,7 @@ various tasks.  A task module is loaded in a POSIX-compliant shell script
 by adding the following boilerplate to the script:
 
 	# Import the task loader.
-	: ${TASK_MODULE_DIR:=/usr/pkg/share/pkgtasks/1.x}
+	: ${TASK_MODULE_DIR:=/usr/pkg/share/pkgtasks-1}
 	. "${TASK_MODULE_DIR}/load.subr"
 
 	# Load task modules.
