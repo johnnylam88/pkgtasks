@@ -50,6 +50,14 @@
 # RETURN VALUES
 #	Returns 0 on success, and >0 if an error occurs.
 #
+# ENVIRONMENT
+#	The following variables are used if they are set:
+#
+#	TASK_LOGFILE
+#		The location of the log file for appending a duplicate of
+#		the output.  If this variable is unset or empty, then no log
+#		output is written.
+#
 # EXAMPLES
 #	task_echo -bcn "Only write this if there is at least one argument:"
 #	for arg; do
@@ -59,8 +67,12 @@
 
 __task_echo__="yes"
 
+task_load tee
+
 task_echo()
 {
+	: ${TASK_LOGFILE:=}
+
 	local action="echo"
 	local newline="
 "
@@ -81,11 +93,18 @@ task_echo()
 		"")	__task_echo_buffer__="$__task_echo_buffer__""$@" ;;
 		*)	__task_echo_buffer__="$__task_echo_buffer__""$@""$newline" ;;
 		esac ;;
-	echo)	case $newline in
-		"")	echo -n "$__task_echo_buffer__""$@" ;;
-		*)	echo "$__task_echo_buffer__""$@" ;;
+	echo)	case ${TASK_LOGFILE} in
+		"")	case $newline in
+			"")	echo -n "$__task_echo_buffer__""$@" ;;
+			*)	echo "$__task_echo_buffer__""$@" ;;
+			esac ;;
+		*)	case $newline in
+			"")	echo -n "$__task_echo_buffer__""$@" ;;
+			*)	echo "$__task_echo_buffer__""$@" ;;
+			esac | task_tee -a "${TASK_LOGFILE}" ;;
 		esac
 		__task_echo_buffer__= ;;
+
 	esac
 	return 0
 }

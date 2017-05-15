@@ -25,6 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+task_load createfile
 task_load echo
 task_load unittest
 
@@ -32,6 +33,11 @@ test_setup()
 {
 	: ${CAT:=cat}
 	: ${CMP:=cmp}
+
+	# Explicitly set TASK_LOGFILE to empty string to prevent unintended
+	# duplicate output.
+	#
+	TASK_LOGFILE=
 }
 
 test1()
@@ -58,6 +64,14 @@ EOF
 		describe="$describe: next write has extra output!"
 		return 1
 	fi
+	for entry in *; do
+		case $entry in
+		expected|value)
+			: "can exist" ;;
+		*)	describe="$describe: unknown file!"
+			return 1 ;;
+		esac
+	done
 	return 0
 }
 
@@ -74,6 +88,14 @@ test2()
 	else
 		return 1
 	fi
+	for entry in *; do
+		case $entry in
+		expected|value)
+			: "can exist" ;;
+		*)	describe="$describe: unknown file!"
+			return 1 ;;
+		esac
+	done
 	return 0
 }
 
@@ -91,8 +113,17 @@ EOF
 	if ${CMP} -s expected value; then
 		: "success"
 	else
+		${CAT} value
 		return 1
 	fi
+	for entry in *; do
+		case $entry in
+		expected|value)
+			: "can exist" ;;
+		*)	describe="$describe: unknown file!"
+			return 1 ;;
+		esac
+	done
 	return 0
 }
 
@@ -107,8 +138,18 @@ test4()
 	if ${CMP} -s expected value; then
 		: "success"
 	else
+		${CAT} value
 		return 1
 	fi
+	for entry in *; do
+		case $entry in
+		expected|value)
+			: "can exist" ;;
+		*)	describe="$describe: unknown file!"
+			return 1 ;;
+		esac
+	done
+	return 0
 }
 
 test5()
@@ -119,8 +160,18 @@ test5()
 	if ${CMP} -s expected value; then
 		: "success"
 	else
+		${CAT} value
 		return 1
 	fi
+	for entry in *; do
+		case $entry in
+		expected|value)
+			: "can exist" ;;
+		*)	describe="$describe: unknown file!"
+			return 1 ;;
+		esac
+	done
+	return 0
 }
 
 test6()
@@ -135,8 +186,193 @@ EOF
 	if ${CMP} -s expected value; then
 		: "success"
 	else
+		${CAT} value
 		return 1
 	fi
+	for entry in *; do
+		case $entry in
+		expected|value)
+			: "can exist" ;;
+		*)	describe="$describe: unknown file!"
+			return 1 ;;
+		esac
+	done
+	return 0
+}
+
+
+test7()
+{
+	describe="task_echo -b buffers text with log"
+	TASK_LOGFILE="${TEST_CURDIR}/log"
+	task_echo -bc "line 1"
+	if [ -f "${TASK_LOGFILE}" ]; then
+		describe="$describe: log exists after first buffered echo!"
+		return 1
+	fi
+	task_echo -b "line 2"
+	if [ -f "${TASK_LOGFILE}" ]; then
+		describe="$describe: log exists after second buffered echo!"
+		return 1
+	fi
+	task_echo "line 3" > value
+	if [ ! -f "${TASK_LOGFILE}" ]; then
+		describe="$describe: log missing!"
+		return 1
+	fi
+	${CAT} > expected << 'EOF'
+line 1
+line 2
+line 3
+EOF
+	if ${CMP} -s expected value; then
+		: "success"
+	else
+		return 1
+	fi
+	if ${CMP} -s value log; then
+		: "success"
+	else
+		describe="$describe: log doesn't match standard output!"
+		${CAT} log
+		return 1
+	fi
+	task_echo "only line" > value
+	echo "only line" >> expected
+	if ${CMP} -s expected log; then
+		: "success"
+	else
+		describe="$describe: log doesn't match all writes!"
+		${CAT} log
+		return 1
+	fi
+	return 0
+}
+
+test8()
+{
+	describe="task_echo -c clears buffer with log"
+	TASK_LOGFILE="${TEST_CURDIR}/log"
+	task_echo -bc "line 1"
+	task_echo -b "line 2"
+	task_echo -cn
+	task_echo "only line" > value
+	echo "only line" > expected
+	if ${CMP} -s expected log; then
+		: "success"
+	else
+		${CAT} log
+		return 1
+	fi
+	if ${CMP} -s value log; then
+		: "success"
+	else
+		describe="$describe: log doesn't match output"
+		${CAT} log
+		return 1
+	fi
+	return 0
+}
+
+test9()
+{
+	describe="task_echo -bc clears buffer with log"
+	TASK_LOGFILE="${TEST_CURDIR}/log"
+	task_echo -bc "line 1"
+	task_echo -b "line 2"
+	task_echo -bc "line 3"
+	task_echo "line 4" > value
+	${CAT} > expected << 'EOF'
+line 3
+line 4
+EOF
+	if ${CMP} -s expected log; then
+		: "success"
+	else
+		${CAT} log
+		return 1
+	fi
+	if ${CMP} -s value log; then
+		: "success"
+	else
+		describe="$describe: log doesn't match output"
+		${CAT} log
+		return 1
+	fi
+	return 0
+}
+
+test10()
+{
+	describe="task_echo -n skips trailing newline with log"
+	TASK_LOGFILE="${TEST_CURDIR}/log"
+	task_echo -bcn "list: 1"
+	task_echo -bn ", 2"
+	task_echo -bn ", 3"
+	task_echo > value
+	echo "list: 1, 2, 3" > expected
+	if ${CMP} -s expected log; then
+		: "success"
+	else
+		${CAT} log
+		return 1
+	fi
+	if ${CMP} -s value log; then
+		: "success"
+	else
+		describe="$describe: log doesn't match output"
+		${CAT} log
+		return 1
+	fi
+	return 0
+}
+
+test11()
+{
+	describe="task_echo preserves leading whitespace with log"
+	TASK_LOGFILE="${TEST_CURDIR}/log"
+	task_echo "    1 2 3 4" > value
+	echo      "    1 2 3 4" > expected
+	if ${CMP} -s expected log; then
+		: "success"
+	else
+		${CAT} log
+		return 1
+	fi
+	if ${CMP} -s value log; then
+		: "success"
+	else
+		describe="$describe: log doesn't match output"
+		${CAT} log
+		return 1
+	fi
+	return 0
+}
+
+test12()
+{
+	describe="task_echo preserves leading whitespace after buffer output with log"
+	TASK_LOGFILE="${TEST_CURDIR}/log"
+	task_echo -bc "header"
+	task_echo "    1 2 3 4" > value
+	${CAT} > expected << 'EOF'
+header
+    1 2 3 4
+EOF
+	if ${CMP} -s expected log; then
+		: "success"
+	else
+		${CAT} log
+		return 1
+	fi
+	if ${CMP} -s value log; then
+		: "success"
+	else
+		describe="$describe: log doesn't match output"
+		${CAT} log
+		return 1
+	fi
+	return 0
 }
 
 task_run_tests "$@"
