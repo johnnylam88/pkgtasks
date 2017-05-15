@@ -2,6 +2,17 @@ Package Tasks
 =============
 
 
+Changes in version 1.4
+----------------------
+**Released on 2017-05-14.**
+
+* Allow duplicate logging of task output to a file through the
+  `echo` task.
+
+* Added `tee` task to duplicate standard input to standard output
+  and into additional files.
+
+
 Changes in version 1.3
 ----------------------
 **Released on 2017-05-13.**
