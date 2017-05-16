@@ -299,7 +299,7 @@ _task_version_compare()
 	esac
 
 	local number1 str1 value1
-	local number1 str2 value2
+	local number2 str2 value2
 	local mode="string"
 
 	while : ; do
