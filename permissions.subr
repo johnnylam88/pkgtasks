@@ -32,7 +32,7 @@
 #	task_check_permissions path mode [owner [group]]
 #	task_set_permissions path mode [owner [group]]
 #
-#	task_permissions add
+#	task_permissions [-s] add
 #	task_permissions check-add
 #
 # DESCRIPTION
@@ -43,8 +43,14 @@
 #	the path.
 #
 #	The task_permissions function supports two actions: "check-add" and
-#	"add".  The function reads standard input line by line and looks for
-#	lines of the form:
+#	"add".
+#
+#	The available options are as follows:
+#
+#	-s	Silent; don't write to standard output.
+#
+#	The task_permissions function reads standard input line by line and
+#	looks for lines of the form:
 #
 #	    # PERMS: <path> <mode> [<owner>] [<group>]
 #
@@ -150,9 +156,21 @@ task_permissions()
 	: ${PKG_PREFIX:=/usr/pkg}
 	: ${PKGNAME:=${0##*/}}
 
+	local arg
+	local echo="task_echo"
+	local OPTIND=1
+	while getopts ":s" arg "$@"; do
+		case $arg in
+		s)	echo=":" ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
+	[ $# -gt 0 ] || return 127
+
 	local action="$1"; shift
 	case $action in
-	add)	task_echo -bc "  > ${PKGNAME}: special permissions" ;;
+	add)	$echo -bc "  > ${PKGNAME}: special permissions" ;;
 	check-add)
 		: "valid options" ;;
 	*)	return 0 ;;
@@ -199,12 +217,12 @@ task_permissions()
 
 		case "$action" in
 		add)	if [ ! -e "$path" ]; then
-				task_echo "    ! permissions not set on missing: $path"
+				$echo "    ! permissions not set on missing: $path"
 				result=1
 			elif task_set_permissions "$path" "$mode" "$user" "$group"; then
-				task_echo "    > permissions set: $msg"
+				$echo "    > permissions set: $msg"
 			else
-				task_echo "    ! permissions not set: $msg"
+				$echo "    ! permissions not set: $msg"
 				result=1
 			fi ;;
 		check-add)

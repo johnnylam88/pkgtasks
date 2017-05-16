@@ -29,13 +29,19 @@
 #	ocaml_findlib.subr -- update OCaml findlib search paths
 #
 # SYNOPSIS
-#	task_ocaml_findlib add | remove
+#	task_ocaml_findlib [-s] add | remove
 #	task_ocaml_findlib check-add | check-remove
 #
 # DESCRIPTION
 #	The task_ocaml_findlib function supports four actions: "add",
-#	"remove", "check-add", and "check-remove".  The function reads
-#	standard input line by line and looks for lines of the form:
+#	"remove", "check-add", and "check-remove".
+#
+#	The available options are as follows:
+#
+#	-s	Silent; don't write to standard output.
+#
+#	The task_ocaml_findlib function reads standard input line by line
+#	and looks for lines of the form:
 #
 #	    # FINDLIB: <libdir> [<ldconf>]
 #
@@ -112,10 +118,22 @@ task_ocaml_findlib()
 
 	: ${OCAML_FINDLIB_REGISTER:=yes}
 
+	local arg
+	local echo="task_echo"
+	local OPTIND=1
+	while getopts ":s" arg "$@"; do
+		case $arg in
+		s)	echo=":" ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
+	[ $# -gt 0 ] || return 127
+
 	local action="$1"; shift
 	case $action in
 	add|remove)
-		task_echo -bc "  > ${PKGNAME}: ocaml library search paths" ;;
+		$echo -bc "  > ${PKGNAME}: ocaml library search paths" ;;
 	check-add|check-remove)
 		: "valid actions" ;;
 	*)	return 0 ;;
@@ -178,7 +196,7 @@ task_ocaml_findlib()
 			case $action in
 			add)	if [ -n "$findlib_register" ]; then
 					if [ -f "$ldconf" ] && task_match -qw "$libdir" < $ldconf; then
-						task_echo "    ! path already added: $libdir"
+						$echo "    ! path already added: $libdir"
 					else
 						temp=$( task_maketemp "$ldconf.pkgtasks.XXXXXXXXXX" )
 						if [ -n "$temp" ]; then
@@ -193,14 +211,14 @@ task_ocaml_findlib()
 							fi > $temp
 							# rename(2) is atomic.
 							if ${MV} -f "$temp" "$ldconf"; then
-								task_echo "    > path added: $libdir"
+								$echo "    > path added: $libdir"
 								__task_ocaml_findlib_temps__=${__task_ocaml_findlib_temps__% $temp_quoted}
 							else
-								task_echo "    ! path not added: $libdir"
+								$echo "    ! path not added: $libdir"
 								line_result=1
 							fi
 						else
-							task_echo "    ! cannot create temporary file for $ldconf"
+							$echo "    ! cannot create temporary file for $ldconf"
 							line_result=1
 						fi
 					fi
@@ -215,18 +233,18 @@ task_ocaml_findlib()
 							task_match -vw "$libdir" < $ldconf > $temp
 							# rename(2) is atomic.
 							if ${MV} -f "$temp" "$ldconf"; then
-								task_echo "    > path removed: $libdir"
+								$echo "    > path removed: $libdir"
 								__task_ocaml_findlib_temps__=${__task_ocaml_findlib_temps__% $temp_quoted}
 							else
-								task_echo "    ! path not removed: $libdir"
+								$echo "    ! path not removed: $libdir"
 								line_result=1
 							fi
 						else
-							task_echo "    ! cannot create temporary file for $ldconf"
+							$echo "    ! cannot create temporary file for $ldconf"
 							line_result=1
 						fi
 					else
-						task_echo "    > path already removed: $libdir"
+						$echo "    > path already removed: $libdir"
 					fi
 				fi ;;
 			check-add)

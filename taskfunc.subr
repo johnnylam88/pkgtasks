@@ -83,6 +83,16 @@ task_function()
 {
 	: ${AWK:=awk}
 
+	local arg
+	local OPTIND=1
+	while getopts ":s" arg "$@"; do
+		case $arg in
+		s)	: "silently accept to match other package tasks" ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
+
 	[ $# -gt 0 ] || return 127
 	local action="$1"; shift
 	local stage="$1"

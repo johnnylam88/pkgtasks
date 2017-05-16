@@ -29,7 +29,7 @@
 #	shlibs.subr -- update the shared library cache
 #
 # SYNOPSIS
-#	task_shlibs add | remove
+#	task_shlibs [-s] add | remove
 #
 # DESCRIPTION
 #	The task_shlibs function supports two actions: "add" and "remove".
@@ -37,6 +37,10 @@
 #	Both the "add" and "remove" actions rebuild the system database
 #	of run-time library search paths so that the system can find the
 #	package's shared libraries.
+#
+#	The available options are as follows:
+#
+#	-s	Silent; don't write to standard output.
 #
 # RETURN VALUES
 #	Returns 0 on success, and >0 if an error occurs.
@@ -61,10 +65,22 @@ task_shlibs()
 
 	: ${PKGNAME:=${0##*/}}
 
+	local arg
+	local echo="task_echo"
+	local OPTIND=1
+	while getopts ":s" arg "$@"; do
+		case $arg in
+		s)	echo=":" ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
+	[ $# -gt 0 ] || return 127
+
 	local action="$1"; shift
 	case $action in
 	add|remove)
-		task_echo -bc "  > ${PKGNAME}: run-time library search paths" ;;
+		$echo -bc "  > ${PKGNAME}: run-time library search paths" ;;
 	*)	return 0 ;;
 	esac
 
@@ -75,9 +91,9 @@ task_shlibs()
 	esac
 
 	if [ $result -eq 0 ]; then
-		task_echo "    > database rebuilt"
+		$echo "    > database rebuilt"
 	else
-		task_echo "    ! database not rebuilt"
+		$echo "    ! database not rebuilt"
 	fi
 	return $result
 }

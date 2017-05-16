@@ -29,14 +29,19 @@
 #	files.subr -- config file management for packages
 #
 # SYNOPSIS
-#	task_files add | remove | perms
+#	task_files [-s] add | remove | perms
 #	task_files check-add | check-remove | check-perms
 #
 # DESCRIPTION
 #	The task_files function supports six actions: "add", "remove",
-#	"perms", "check-add", "check-remove", and "check-perms".  The
-#	function reads standard input line by line and looks for lines of
-#	the form:
+#	"perms", "check-add", "check-remove", and "check-perms".
+#
+#	The available options are as follows:
+#
+#	-s	Silent; don't write to standard output.
+#
+#	The task_files function reads standard input line by line and
+#	looks for lines of the form:
 #
 #	    # FILE: <target> <flags> <source> [<mode> [<user> [<group>]]]
 #
@@ -137,10 +142,22 @@ task_files()
 	: ${PKG_CONFIG_PERMS:=yes}
 	: ${PKG_RCD_SCRIPTS:=yes}
 
+	local arg
+	local echo="task_echo"
+	local OPTIND=1
+	while getopts ":s" arg "$@"; do
+		case $arg in
+		s)	echo=":" ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
+	[ $# -gt 0 ] || return 127
+
 	local action="$1"; shift
         case $action in
 	add|remove|perms)
-		task_echo -bc "  > ${PKGNAME}: files" ;;
+		$echo -bc "  > ${PKGNAME}: files" ;;
 	check-add|check-remove|check-perms)
 		: "valid actions" ;;
 	*)      return 0 ;;
@@ -247,27 +264,27 @@ task_files()
 					if [ -z "$refcount" ]; then
 						task_refcount prop_put files "$path" preexist || line_result=1
 					fi
-					task_echo "    ! file already exists: $d_path"
+					$echo "    ! file already exists: $d_path"
 				elif [ -f "$egfile" -o -c "$egfile" ]; then
 					# Example file exists.
 					if [ -z "$copy" ]; then
 						: "file is never copied"
 					elif [ "$copy" = "seen" ]; then
-						task_echo "    ! file copy skipped: $d_path"
+						$echo "    ! file copy skipped: $d_path"
 					elif ${CP} "$egfile" "$d_path"; then
-						task_echo "    > file copied: $d_path"
+						$echo "    > file copied: $d_path"
 						changes="$changes copy"
 					else
-						task_echo "    ! file not copied: $d_path"
+						$echo "    ! file not copied: $d_path"
 						line_result=1
 					fi
 				else
-					task_echo "    ! file not copied: $d_path"
+					$echo "    ! file not copied: $d_path"
 					line_result=1
 				fi
 			else
 				# add refcount failed; skip to next line
-				task_echo "    ! refcount add failure: files $path"
+				$echo "    ! refcount add failure: files $path"
 				result=1
 				continue
 			fi ;;
@@ -291,14 +308,14 @@ task_files()
 				add|perms)
 					task_refcount prop_put files "$path" permissions "$mode" "$user" "$group" || line_result=1
 					if [ ! -f "$d_path" ]; then
-						task_echo "    ! file permissions not set on missing: $msg"
+						$echo "    ! file permissions not set on missing: $msg"
 						line_result=1
 					elif [ -z "$pkg_config_perms" ]; then
-						task_echo "    ! file permissions skipped: $msg"
+						$echo "    ! file permissions skipped: $msg"
 					elif task_set_permissions "$d_path" "$mode" "$user" "$group"; then
-						task_echo "    > file permissions set: $msg"
+						$echo "    > file permissions set: $msg"
 					else
-						task_echo "    ! file permissions not set: $msg"
+						$echo "    ! file permissions not set: $msg"
 						line_result=1
 					fi ;;
 				check-add|check-perms)
@@ -327,24 +344,24 @@ task_files()
 							if task_compare "$d_path" "$egfile"; then
 								if [ "$remove" = "yes" ]; then
 									if ${RM} -f "$d_path"; then
-										task_echo "    > file removed: $d_path"
+										$echo "    > file removed: $d_path"
 									else
 										line_result=1
 									fi
 								fi
 							else
-								task_echo "    ! file differs from default: $d_path"
+								$echo "    ! file differs from default: $d_path"
 							fi
 						fi
 						if [ -f "$d_path" ]; then
-							task_echo "    ! file not removed: $d_path"
+							$echo "    ! file not removed: $d_path"
 						fi
 						# delete the reference count
 						task_refcount delete files "$path"
 					fi
 				else
 					# remove refcount failed
-					task_echo "    ! refcount remove failure: files $path"
+					$echo "    ! refcount remove failure: files $path"
 					line_result=1
 				fi ;;
 			check-remove)

@@ -29,14 +29,20 @@
 #	info_files.subr -- GNU info file management for packages
 #
 # SYNOPSIS
-#	task_info_files add | remove
+#	task_info_files [-s] add | remove
 #
 # DESCRIPTION
 #	The task_info_files function supports two actions, "add" and
 #	"remove", that will add or remove entries from GNU info files
 #	from index files (the "dir" file in the same diretory as the info
-#	files).  The function reads standard input line by line and looks
-#	for lines of the form:
+#	files).
+#
+#	The available options are as follows:
+#
+#	-s	Silent; don't write to standard output.
+#
+#	The task_info_files function reads standard input line by line and
+#	looks for lines of the form:
 #
 #	    # INFO: <file> [<infodir>]
 #
@@ -88,10 +94,23 @@ task_info_files()
 	: ${PKG_PREFIX:=/usr/pkg}
 	: ${PKGNAME:=${0##*/}}
 
+	local arg
+	local echo="$echo"
+	local silent=
+	local OPTIND=1
+	while getopts ":s" arg "$@"; do
+		case $arg in
+		s)	echo=":"; silent="-s" ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
+	[ $# -gt 0 ] || return 127
+
 	local action="$1"; shift
 	case $action in
 	add|remove)
-		task_echo -bc "  > ${PKGNAME}: GNU info files" ;;
+		$echo -bc "  > ${PKGNAME}: GNU info files" ;;
 	*)	return 0 ;;
 	esac
 
@@ -129,7 +148,7 @@ task_info_files()
 		infodir="${PKG_DESTDIR}$infodir"
 
 		if [ ! -f "$file" ]; then
-			task_echo "    ! info file missing: $file"
+			$echo "    ! info file missing: $file"
 			result=1
 			continue
 		fi
@@ -151,25 +170,25 @@ task_info_files()
 			[ -d "$infodir" ] || task_makedir "$infodir"
 			${INSTALL_INFO} "$file" "$index" || line_result=1
 			if [ $line_result -eq 0 ]; then
-				task_echo "    > info file registered: $file"
+				$echo "    > info file registered: $file"
 			else
-				task_echo "    ! info file not registered: $file"
+				$echo "    ! info file not registered: $file"
 			fi ;;
 		remove)	if [ -f "$index" ]; then
 				${INSTALL_INFO} --delete "$file" "$index" || line_result=1
 				if [ $line_result -eq 0 ]; then
-					task_echo "    > info file unregistered: $file"
+					$echo "    > info file unregistered: $file"
 				else
-					task_echo "    ! info file not unregistered: $file"
+					$echo "    ! info file not unregistered: $file"
 				fi
 			else
-				task_echo "    > info file already unregistered: $file"
+				$echo "    > info file already unregistered: $file"
 			fi ;;
 		esac
 		[ $line_result -eq 0 ] || result=1
 	done
 
-	_task_info_files_cleanup
+	_task_info_files_cleanup $silent
 	return $result
 }
 
@@ -178,6 +197,19 @@ _task_info_files_cleanup()
 	: ${RM:=rm}
 	: ${RMDIR:=rmdir}
 
+	local arg
+	local echo="task_echo"
+	local OPTIND=1
+	while getopts ":s" arg "$@"; do
+		case $arg in
+		s)	echo=":" ;;
+		*)	return 127 ;;
+		esac
+	done
+	shift $(( ${OPTIND} - 1 ))
+
+	# Guard against ${PKG_PREFIX} == "/".
+	local prefix
 	eval set -- $__task_info_files_indices__
 	local index
 	for index; do
@@ -192,7 +224,7 @@ _task_info_files_cleanup()
 		else
 			${RM} -f "$index"
 			${RMDIR} -p "${index%/*}" 2>/dev/null
-			task_echo "    > empty dir file removed: $index"
+			$echo "    > empty dir file removed: $index"
 		fi
 	done
 	__task_info_files_indices__=
