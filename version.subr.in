@@ -38,7 +38,7 @@
 # DESCRIPTION
 #	${TASK_VERSION} is the version number of the installed task modules.
 #
-#	The task_version_check function checks whether <check_verison>
+#	The task_version_check function checks whether <check_version>
 #	satisfies the constraints specified in the remaining parameters.
 #	The remaining parameters are contraints of pairs of an operator and
 #	a version number, and the constraints must all be met for a
@@ -51,7 +51,7 @@
 #		<swver>[+<pkgver>]
 #
 #	<swver> represents the version of the software and SHOULD be
-#	identcal to the version string used by the maintainer of the
+#	identical to the version string used by the maintainer of the
 #	software.
 #
 #	<pkgver> is a version that is independent of the version of the
