@@ -163,6 +163,11 @@ task_version_check()
 			1)	: "match" ;;
 			*)	return 1 ;;
 			esac ;;
+		"!=")	# not equal to
+			case $cmp_result in
+			0|2)	: "match" ;;
+			*)	return 1 ;;
+			esac ;;
 		">=")	# greater than or equal to
 			case $cmp_result in
 			1|2)	: "match" ;;
