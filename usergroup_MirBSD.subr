@@ -380,6 +380,7 @@ platform_useradd()
 	# Lower bound of UID range for new users.
 	local lowuid=700
 
+	local basedir=
 	local descr=
 	local home=
 	local group=
