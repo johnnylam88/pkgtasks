@@ -98,9 +98,18 @@ task_postinstall()
 	local result=0
 	local stage="postinstall"
 
-	local post_fn
+	local post_fn silent
 	for post_fn in $post_actions; do
-		if $post_fn add $stage < $datafile; then
+		case $post_fn in
+		task_files|\
+		task_permissions|\
+		task_shells)
+			# These tasks should be verbose since they touch
+			# system files and directories.
+			silent= ;;
+		*)	silent="-s" ;;
+		esac
+		if $post_fn $silent add $stage < $datafile; then
 			: "success"
 		else
 			post_checks="$post_checks $post_fn"

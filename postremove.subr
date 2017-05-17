@@ -98,13 +98,23 @@ task_postremove()
 	local result=0
 	local stage="preinstall"
 
-	local post_fn
+	local post_fn silent
 	for post_fn in $post_actions; do
+		case $post_fn in
+		task_directories|\
+		task_groups|\
+		task_shells|\
+		task_users)
+			# These tasks should be verbose since they touch
+			# system files and directories.
+			silent= ;;
+		*)	silent="-s" ;;
+		esac
 		case $post_fn in
 		task_directories)
 			# Reverse-sort.
-			task_sort -r < $datafile | $post_fn remove $stage ;;
-		*)	$post_fn remove $stage < $datafile ;;
+			task_sort -r < $datafile | $post_fn $silent remove $stage ;;
+		*)	$post_fn $silent remove $stage < $datafile ;;
 		esac
 		if [ $? -gt 0 ]; then
 			# Any errors during postremove are non-fatal.
