@@ -2,6 +2,22 @@ Package Tasks
 =============
 
 
+Changes in version 1.5
+----------------------
+**Released on 2017-05-17.**
+
+* Support `~[string]` (tilde string) in a version string to sort
+  before a release version, e.g., 1.2~rc1 sorts before 1.2.
+
+* When invoking a meta-task, only be verbose when invoking tasks
+  that typically affect system files and directories.  This
+  makes the output a bit more friendly for the typicaly user,
+  who is no longer bombarded with every trivial GNU info file
+  registration.
+
+* Bug fixes.
+
+
 Changes in version 1.4
 ----------------------
 **Released on 2017-05-14.**
