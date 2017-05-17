@@ -387,7 +387,7 @@ platform_useradd()
 	local uid=
 	local arg
 	local OPTIND=1
-	while getopts ":b:c:d:efGg:kLMmo:prs:u:v" arg "$@"; do
+	while getopts ":c:d:g:s:u:" arg "$@"; do
 		case $arg in
 		c)	descr=${OPTARG} ;;
 		d)	home=${OPTARG} ;;
