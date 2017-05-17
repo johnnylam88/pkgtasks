@@ -177,11 +177,53 @@ test24()
 
 test25()
 {
+	describe="1.2~ < 1.2"
+	task_version_compare -v 1.2~ 1.2
+}
+
+test26()
+{
+	describe="1.2~alpha1 = 1.2alpha1"
+	task_version_compare -v 1.2~alpha1 1.2alpha1
+	[ $? -eq 1 ]
+}
+
+test27()
+{
+	describe="1.2~a1 < 1.2alpha1"
+	task_version_compare -v 1.2~a1 1.2alpha1
+}
+
+test28()
+{	describe="1.2~a~b < 1.2~a"
+	task_version_compare -v 1.2~a~b 1.2~a
+}
+
+test29()
+{
+	describe="1.2alpha1 < 1.2~b1"
+	task_version_compare -v 1.2alpha1 1.2~b1
+}
+
+test30()
+{
+	describe="~~ < ~"
+	task_version_compare -v "~~" "~"
+}
+
+test31()
+{
+	describe="~ < ~a"
+	task_version_compare -v "~" "~a"
+}
+
+test32()
+{
 	describe="version_check 1.2 >= 1.0"
 	task_version_check 1.2 ">=" 1.0
 }
 
-test26()
+test33()
 {
 	describe="version_check 1.2 >= 2.0 is false"
 	if task_version_check 1.2 ">=" 2.0; then
@@ -189,13 +231,13 @@ test26()
 	fi
 }
 
-test27()
+test34()
 {
 	describe="version_check 1.2 > 1.0"
 	task_version_check 1.2 ">" 1.0
 }
 
-test28()
+test35()
 {
 	describe="version_check 1.2 > 2.0 is false"
 	if task_version_check 1.2 ">" 2.0; then
@@ -203,13 +245,13 @@ test28()
 	fi
 }
 
-test29()
+test36()
 {
 	describe="version_check 1.2 = 1.2"
 	task_version_check 1.2 "=" 1.2
 }
 
-test30()
+test37()
 {
 	describe="version_check 1.2 = 2.0 is false"
 	if task_version_check 1.2 "=" 2.0; then
@@ -217,13 +259,13 @@ test30()
 	fi
 }
 
-test31()
+test38()
 {
 	describe="version_check 1.2 < 2.0"
 	task_version_check 1.2 "<" 2.0
 }
 
-test32()
+test39()
 {
 	describe="version_check 1.2 < 1.0 is false"
 	if task_version_check 1.2 "<" 1.0; then
@@ -231,13 +273,13 @@ test32()
 	fi
 }
 
-test33()
+test40()
 {
 	describe="version_check 1.2 <= 2.0"
 	task_version_check 1.2 "<=" 2.0
 }
 
-test34()
+test41()
 {
 	describe="version_check 1.2 <= 1.0 is false"
 	if task_version_check 1.2 "<=" 1.0; then
@@ -245,19 +287,19 @@ test34()
 	fi
 }
 
-test35()
+test42()
 {
 	describe="version_check 1.2 *"
 	task_version_check 1.2 "*" ""
 }
 
-test36()
+test43()
 {
 	describe="version_check 1.2 >= 1.0 < 2.0"
 	task_version_check 1.2 ">=" 1.0 "<" 2.0
 }
 
-test37()
+test44()
 {
 	describe="version_check 1.2 >= 1.0 < 1.1 is false"
 	if task_version_check 1.2 ">=" 1.0 "<" 1.1; then
@@ -265,13 +307,13 @@ test37()
 	fi
 }
 
-test38()
+test45()
 {
 	describe="version_check Charlie < Delta"
 	task_version_check Charlie "<" Delta
 }
 
-test39()
+test46()
 {
 	describe="version_check Delta > Charlie"
 	task_version_check Delta ">" Charlie

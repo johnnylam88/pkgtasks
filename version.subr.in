@@ -76,15 +76,17 @@
 #	There are magic strings that may be found in version numbers, listed
 #	below in sorting order from lowest to highest:
 #
+#	    ~[string]	Tilde (ASCII 126) string; sorts before a release
+#			version.  The string after the '~' is optional.
 #
-#	    alpha	Equates to "alpha version" and sorts before a beta
-#			version.
+#	    alpha	Equates to "alpha version" and is a synonym for
+#			"~alpha".
 #
-#	    beta	Equates to "beta version" and sorts before a release
-#			candidate.
+#	    beta	Equates to "beta version" and is a synonym for
+#			"~beta".
 #
-#	    rc		Equates to "release candidate" and sorts before a
-#			release.
+#	    rc		Equates to "release candidate" and is a synonym for
+#			"~rc".
 #
 #	    pre		Equates to "pre-release" and is a synonym for a
 #			release candidate.
@@ -269,18 +271,15 @@ _task_version_compare()
 
 	# Same versions.
 	if [ "$version1" = "$version2" ]; then
-		$echo "    > equal"
-		return 1
+		$echo "    > equal"; return 1
 	fi
 
 	# Null versions.
 	if [ -z "$version1" ]; then
-		$echo "    > less than"
-		return 0
+		$echo "    > less than"; return 0
 	fi
 	if [ -z "$version2" ]; then
-		$echo "    > more than"
-		return 2
+		$echo "    > more than"; return 2
 	fi
 
 	# Break down version numbers for comparisions.
@@ -298,8 +297,8 @@ _task_version_compare()
 	*)	version2="$version2" ;;
 	esac
 
-	local number1 str1 value1
-	local number2 str2 value2
+	local number1 str1 value1 tilde1 substr1
+	local number2 str2 value2 tilde2 substr2
 	local mode="string"
 
 	while : ; do
@@ -323,17 +322,13 @@ _task_version_compare()
 				# Both version numbers terminate.
 				break
 			elif [ -z "$number1" ]; then
-				$echo "    > less than"
-				return 0
+				$echo "    > less than"; return 0
 			elif [ -z "$number2" ]; then
-				$echo "    > more than"
-				return 2
+				$echo "    > more than"; return 2
 			elif [ $number1 -lt $number2 ]; then
-				$echo "    > less than"
-				return 0
+				$echo "    > less than"; return 0
 			elif [ $number1 -gt $number2 ]; then
-				$echo "    > more than"
-				return 2
+				$echo "    > more than"; return 2
 			fi
 			mode="string"
 			;;
@@ -406,52 +401,98 @@ _task_version_compare()
 				;;
 			esac
 			#
-			# Assign numerical values to the strings for comparison.
-			# We can't do a straight string comparison because some of
-			# the strings are magic tokens.
+			# Some magic values that sort before a release version.
 			#
 			case $str1 in
-			alpha)		value1=100 ;;
-			beta)		value1=200 ;;
-			pre|rc)		value1=300 ;;
-			"")		value1=400 ;;
-			[.]|_|pl)	value1=500 ;;
-			*)		value1=1000 ;;
+			alpha|beta|rc)
+				str1="~$str1" ;;
+			pre)	str1="~rc" ;;	# synonym for "rc"
 			esac
 			case $str2 in
-			alpha)		value2=100 ;;
-			beta)		value2=200 ;;
-			pre|rc)		value2=300 ;;
-			"")		value2=400 ;;
-			[.]|_|pl)	value2=500 ;;
-			*)		value2=1000 ;;
+			alpha|beta|rc)
+				str2="~$str2" ;;
+			pre)	str2="~rc" ;;	# synonym for "rc"
 			esac
-			$echo "    > \"$str1 ($value1) | $version1\" vs. \"$str2 ($value2) | $version2\""
-			if [ $value1 -eq 1000 -a $value2 -eq 1000 ]; then
-				# Non-empty string comparisons.
-				if _task_string_compare "$str1" "<" "$str2"; then
-					$echo "    > less than"
-					return 0
-				elif _task_string_compare "$str1" ">" "$str2"; then
-					$echo "    > more than"
-					return 2
+			#
+			# Early short-circuit comparisons.
+			#
+			case $str1/$str2 in
+			"~"*/[!~]*)
+				$echo "    > less than"; return 0 ;;
+			[!~]*/"~"*)
+				$echo "    > more than"; return 2 ;;
+			"~"*/"~"*|[!~]*/[!~]*)
+				: "fall through to string comparison" ;;
+			esac
+			# Compare successive substrings separated by '~'.
+			while : ; do
+				# Set substr<n> to the string before the next '~'
+				# character, and set str<n> to the remaining string
+				# starting from the next '~' character.
+				#
+				case $str1 in
+				"~"*)	tilde1="~"; str1=${str1#~} ;;
+				*)	tilde1= ;;
+				esac
+				case $str1 in
+				*"~"*)	substr1=${str1%%~*}
+					str1=${str1#$substr1} ;;
+				*)	substr1=$str1
+					str1= ;;
+				esac
+				substr1="$tilde1$substr1"
+				case $str2 in
+				"~"*)	tilde2="~"; str2=${str2#~} ;;
+				*)	tilde2= ;;
+				esac
+				case $str2 in
+				*"~"*)	substr2=${str2%%~*}
+					str2=${str2#$substr2} ;;
+				*)	substr2=$str2
+					str2= ;;
+				esac
+				substr2="$tilde2$substr2"
+				#
+				# Assign numerical values to the strings for
+				# comparison.  We can't do a straight string
+				# comparison because some of the strings are
+				# magic tokens.
+				#
+				case $substr1 in
+				~*)		value1=100 ;;
+				"")		value1=400 ;;
+				[.]|_|pl)	value1=500 ;;
+				*)		value1=1000 ;;
+				esac
+				case $substr2 in
+				~*)		value2=100 ;;
+				"")		value2=400 ;;
+				[.]|_|pl)	value2=500 ;;
+				*)		value2=1000 ;;
+				esac
+				$echo "    > \"$substr1 ($value1) / $str1 | $version1\" vs. \"$substr2 ($value2) / $str2 | $version2\""
+				if [ $value1 -eq 1000 -a $value2 -eq 1000 ] ||
+				   [ $value1 -eq 100 -a $value2 -eq 100 ]; then
+					# Non-empty string comparisons.
+					if _task_string_compare "$substr1" "<" "$substr2"; then
+						$echo "    > less than"; return 0
+					elif _task_string_compare "$substr1" ">" "$substr2"; then
+						$echo "    > more than"; return 2
+					fi
+				elif [ $value1 -eq 400 -a $value2 -eq 400 ]; then
+					# Both version numbers terminate.
+					break
+				elif [ $value1 -lt $value2 ]; then
+					$echo "    > less than"; return 0
+				elif [ $value1 -gt $value2 ]; then
+					$echo "    > more than"; return 2
 				fi
-			elif [ $value1 -eq 400 -a $value2 -eq 400 ]; then
-				# Both version numbers terminate.
-				break
-			elif [ $value1 -lt $value2 ]; then
-				$echo "    > less than"
-				return 0
-			elif [ $value1 -gt $value2 ]; then
-				$echo "    > more than"
-				return 2
-			fi
+			done
 			mode="number"
 			;;
 		esac
 	done
-	$echo "    > equal"
-	return 1
+	$echo "    > equal"; return 1
 }
 
 _task_string_compare()
