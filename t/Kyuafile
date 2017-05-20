@@ -12,7 +12,7 @@
 
 syntax( 2 )
 
-test_suite( "pkgtask" )
+test_suite( "pkgtasks" )
 
 tap_test_program { name = "t_compare" }
 tap_test_program { name = "t_createfile" }
