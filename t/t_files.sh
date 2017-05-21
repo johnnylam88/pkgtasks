@@ -58,7 +58,7 @@ EOF
 	${CHMOD} 0400 unwriteable
 
 	# Don't copy rc.d scripts.
-	PKG_RCD_SCRIPTS="no"
+	PKG_INIT_SCRIPTS="no"
 }
 
 test_destdir_setup()

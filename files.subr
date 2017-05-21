@@ -53,7 +53,7 @@
 #
 #	    c	file is copied into place
 #	    f	ignore ${PKG_CONFIG} value
-#	    r	file is an rc.d script (consider ${PKG_RCD_SCRIPTS})
+#	    r	file is an init script (consider ${PKG_INIT_SCRIPTS})
 #	    .   placeholder flag to ensure the field is non-empty
 #
 #	The "add" action copies the source path to the target path if the
@@ -109,10 +109,10 @@
 #		A "destdir" prefix that is prepended to all filesystem
 #		paths.  The default value is the empty string.
 #
-#	PKG_RCD_SCRIPTS
-#		If ${PKG_CONFIG} and ${PKG_RCD_SCRIPTS} are both "truthy"
+#	PKG_INIT_SCRIPTS
+#		If ${PKG_CONFIG} and ${PKG_INIT_SCRIPTS} are both "truthy"
 #		values, then the "add" and "remove" actions are allowed
-#		to copy and remove files that are flagged as rc.d scripts.
+#		to copy and remove files that are flagged as init scripts.
 #
 #	PKG_PREFIX
 #		The installation prefix of the package.  The default is
@@ -140,7 +140,7 @@ task_files()
 
 	: ${PKG_CONFIG:=yes}
 	: ${PKG_CONFIG_PERMS:=yes}
-	: ${PKG_RCD_SCRIPTS:=yes}
+	: ${PKG_INIT_SCRIPTS:=yes}
 
 	local arg
 	local echo="task_echo"
@@ -172,10 +172,21 @@ task_files()
 
 	local pkg_config="yes"
 	local pkg_config_perms="yes"
-	local pkg_rcd_scripts="yes"
+	local pkg_init_scripts="yes"
 	task_is_truthy "${PKG_CONFIG}" || pkg_config=
 	task_is_truthy "${PKG_CONFIG_PERMS}" || pkg_config_perms=
-	task_is_truthy "${PKG_RCD_SCRIPTS}" || pkg_rcd_scripts=
+	task_is_truthy "${PKG_INIT_SCRIPTS}" || pkg_init_scripts=
+	#
+	# Deprecated: PKG_RCD_SCRIPTS is deprecated, but if it's set, it
+	# overrides ${PKG_INIT_SCRIPTS}.
+	#
+	if [ -n "${PKG_RCD_SCRIPTS}" ]; then
+		if task_is_truthy "${PKG_RCD_SCRIPTS}"; then
+			pkg_init_scripts="yes"
+		else
+			pkg_init_scripts=
+		fi
+	fi
 
 	local result line_result
 	local msg
@@ -225,8 +236,8 @@ task_files()
 			case $flags in
 			*f*)	# "f" always implies copy.
 				copy="yes" ;;
-			*r*)	# "r" implies if PKG_CONFIG and PKG_RCD_SCRIPTS are both truthy.
-				if [ -n "$pkg_config" -a -n "$pkg_rcd_scripts" ]; then
+			*r*)	# "r" implies copy if PKG_CONFIG and PKG_INIT_SCRIPTS are both truthy.
+				if [ -n "$pkg_config" -a -n "$pkg_init_scripts" ]; then
 					copy="yes"
 				fi ;;
 			*)	# otherwise, copy if PKG_CONFIG is truthy.
@@ -242,8 +253,8 @@ task_files()
 			case $flags in
 			*f*)	# "f" always implies remove.
 				remove="yes" ;;
-			*r*)	# "r" implies if PKG_CONFIG and PKG_RCD_SCRIPTS are both truthy.
-				if [ -n "$pkg_config" -a -n "$pkg_rcd_scripts" ]; then
+			*r*)	# "r" implies remove if PKG_CONFIG and PKG_INIT_SCRIPTS are both truthy.
+				if [ -n "$pkg_config" -a -n "$pkg_init_scripts" ]; then
 					remove="yes"
 				fi ;;
 			*)	# otherwise, remove if PKG_CONFIG is truthy.
