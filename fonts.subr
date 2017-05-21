@@ -213,10 +213,11 @@ _task_fonts_index_ttf()
 
 	local arg
 	local echo="task_echo"
+	local silent=
 	local OPTIND=1
 	while getopts ":s" arg "$@"; do
 		case $arg in
-		s)	echo=":"; ;;
+		s)	echo=":"; silent="-s" ;;
 		*)	return 127 ;;
 		esac
 	done
@@ -253,6 +254,8 @@ _task_fonts_index_ttf()
 		fi
 	fi
 	( cd "$fontdir" && $command >/dev/null )
+	# TTF font directories also require X11 indexing.
+	_task_fonts_index_x11 $silent "$fontdir"
 	return 0
 }
 
@@ -263,10 +266,11 @@ _task_fonts_index_type1()
 
 	local arg
 	local echo="task_echo"
+	local silent=
 	local OPTIND=1
 	while getopts ":s" arg "$@"; do
 		case $arg in
-		s)	echo=":"; ;;
+		s)	echo=":"; silent="-s" ;;
 		*)	return 127 ;;
 		esac
 	done
@@ -303,7 +307,8 @@ _task_fonts_index_type1()
 		fi
 	fi
 	( cd "$fontdir" && $command >/dev/null )
-
+	# Type1 font directories also require X11 indexing.
+	_task_fonts_index_x11 $silent "$fontdir"
 	return 0
 }
 
@@ -324,7 +329,7 @@ _task_fonts_index_x11()
 	[ $# -gt 0 ] || return 127
 
 	local fontdir="$1"; shift
-	local encodings_dir="$1"; shift
+	local encodings_dir="$1"
 	local command=
 
 	# Cache mkfontdir(1) location.

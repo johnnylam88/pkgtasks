@@ -114,6 +114,10 @@ test2()
 		describe="$describe: ${PKG_PREFIX}/$fontdir_ttf missing!"
 		return 1
 	fi
+	if [ ! -f "${PKG_PREFIX}/$fontdir_ttf/encodings.dir" ]; then
+		describe="$describe: x11 encodings missing!"
+		return 1
+	fi
 	return 0
 }
 
@@ -147,6 +151,10 @@ test4()
 	fi
 	if [ ! -d "${PKG_PREFIX}/$fontdir_type1" ]; then
 		describe="$describe: ${PKG_PREFIX}/$fontdir_type1 missing!"
+		return 1
+	fi
+	if [ ! -f "${PKG_PREFIX}/$fontdir_type1/encodings.dir" ]; then
+		describe="$describe: x11 encodings missing!"
 		return 1
 	fi
 	return 0
@@ -227,6 +235,10 @@ test8()
 		describe="$describe: $fontdir missing!"
 		return 1
 	fi
+	if [ ! -f "$fontdir/encodings.dir" ]; then
+		describe="$describe: x11 encodings missing!"
+		return 1
+	fi
 	if [ -d "${PKG_PREFIX}/$fontdir_ttf" ]; then
 		describe="$describe: ${PKG_PREFIX}/$fontdir_ttf exists!"
 		return 1
@@ -272,6 +284,10 @@ test10()
 	fi
 	if [ ! -d "$fontdir" ]; then
 		describe="$describe: $fontdir missing!"
+		return 1
+	fi
+	if [ ! -f "$fontdir/encodings.dir" ]; then
+		describe="$describe: x11 encodings missing!"
 		return 1
 	fi
 	if [ -d "${PKG_PREFIX}/$fontdir_type1" ]; then
