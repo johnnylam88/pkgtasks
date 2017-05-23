@@ -42,6 +42,18 @@
 #
 #	-s	Silent; don't write to standard output.
 #
+#	The task_shlibs function reads standard input line by line and
+#	looks for lines of the form:
+#
+#	    # SHLIB: <directory> [...]
+#
+#	The directory paths are all passed as shell positional paramters
+#	to the ${LDCONFIG_ADD_CMD} and ${LDCONFIG_REMOVE_CMD} command
+#	lines.
+#
+#	If any directory paths are relative, then they are assumed to be
+#	relative to ${PKG_PREFIX}.
+#
 # RETURN VALUES
 #	Returns 0 on success, and >0 if an error occurs.
 #
@@ -51,17 +63,36 @@
 #	LDCONFIG
 #		The name or path to the ldconfig(8) utility.
 #
+#	LDCONFIG_ADD_CMD
+#	LDCONFIG_REMOVE_CMD
+#		The command-line to be invoked to update the system
+#		run-time library paths cache when adding or removing
+#		a package.
+#
+#		Possible: any shell command-line
+#		Default: ${LDCONFIG}
+#
 #	PKGNAME
 #		The name of the package.
+#
+#	PKG_DESTDIR
+#		A "destdir" prefix that is prepended to all filessystem
+#		paths.  The default value is the empty string.
+#
+#	PKG_PREFIX
+#		The installation prefix of the package.  The default is
+#		"/usr/pkg".
 #
 
 __task_shlibs__="yes"
 
 task_load echo
+task_load quote
 
 task_shlibs()
 {
-	: ${LDCONFIG:=ldconfig}
+	: ${LDCONFIG_ADD_CMD:=_task_shlibs_run}
+	: ${LDCONFIG_REMOVE_CMD:=_task_shlibs_run}
 
 	: ${PKGNAME:=${0##*/}}
 
@@ -84,16 +115,60 @@ task_shlibs()
 	*)	return 0 ;;
 	esac
 
-	local result=0
-	case $action in
-	add)	${LDCONFIG} >/dev/null || result=1 ;;
-	remove)	${LDCONFIG} >/dev/null || result=1 ;;
+	# Guard against ${PKG_PREFIX} == "/".
+	local prefix
+	case ${PKG_PREFIX}/ in
+	//)	prefix= ;;
+	*)	prefix=${PKG_PREFIX} ;;
 	esac
 
+	local quoted paths
+	paths=
+	local hash tag path
+	while read hash tag dirs; do
+		# Filter for "# SHLIB:".
+		case $hash/$tag in
+		"#/SHLIB:")
+			: "use this line" ;;
+		*)	continue ;;
+		esac
+		case $dirs in
+		"")	# skip lines without any required args
+			continue ;;
+		esac
+		# Canonicalize paths.
+		set -o noglob; set -- $dirs; set +o noglob
+		for path; do
+			case $path in
+			"")	# skip empty pathnames
+				continue ;;
+			[!/]*)	path="$prefix/$path" ;;
+			esac
+			path="${PKG_DESTDIR}$path"
+			task_quote "$path"
+			paths="$paths $quoted"
+		done
+	done
+	[ -n "$paths" ] || return 0
+
+	local result=0
+	case $action in
+	add)	( eval set -- $paths; ${LDCONFIG_ADD_CMD} ) >/dev/null ||
+			result=1 ;;
+	remove)	( eval set -- $paths; ${LDCONFIG_REMOVE_CMD} ) >/dev/null ||
+			result=1 ;;
+	esac
 	if [ $result -eq 0 ]; then
 		$echo "    > database rebuilt"
 	else
 		$echo "    ! database not rebuilt"
 	fi
 	return $result
+}
+
+_task_shlibs_run()
+{
+	: ${LDCONFIG:=ldconfig}
+
+	${LDCONFIG}
 }

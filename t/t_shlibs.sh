@@ -31,39 +31,54 @@ task_load unittest
 
 test_setup()
 {
+	: ${CAT:=cat}
 	: ${GREP:=grep}
 	: ${MV:=mv}
 
 	: ${PKGNAME:=${0##*/}}
+
+	PKG_PREFIX="${TEST_CURDIR}"
+	PKG_DESTDIR=
+
+	datafile="datafile"
+	${CAT} > $datafile << EOF
+# SHLIB: lib
+EOF
 
 	dbfile="shlibs"
 	dbfile_tmp="$dbfile.tmp.$$"
 	task_createfile "$dbfile"
 }
 
-# Mock ldconfig that just toggles between adding and removing ${PKGNAME}
+# Mock ldconfig that just toggles between adding and removing paths
 # from a flat text file.
 #
 ldconfig()
 {
-	if ${GREP} -q "^${PKGNAME}$" < $dbfile; then
-		${GREP} -v "${PKGNAME}" < $dbfile > $dbfile_tmp
-		${MV} -f "$dbfile_tmp" "$dbfile"
-	else
-		echo "${PKGNAME}" >> $dbfile
-	fi
+	: ${GREP:=grep}
+	: ${MV:=mv}
+
+	[ $# -gt 0 ] || set -- ${PKG_PREFIX}/lib
+	for path; do
+	 	if ${GREP} -q '^'"$path"'$' < $dbfile; then
+			${GREP} -v '^'"$path"'$' < $dbfile > $dbfile_tmp
+			${MV} -f "$dbfile_tmp" "$dbfile"
+		else
+			echo "$path" >> $dbfile
+		fi
+	done
 	return 0
 }
 
 test1()
 {
 	describe="add with empty cache"
-	if task_shlibs add; then
+	if task_shlibs add < $datafile; then
 		: "success"
 	else
 		return 1
 	fi
-	if ${GREP} -q "${PKGNAME}" "$dbfile"; then
+	if ${GREP} -cq "^" "$dbfile"; then
 		: "success"
 	else
 		describe="$describe: not in $dbfile!"
@@ -75,13 +90,13 @@ test1()
 test2()
 {
 	describe="remove after adding to cache"
-	task_shlibs add
-	if task_shlibs remove; then
+	task_shlibs add < $datafile
+	if task_shlibs remove < $datafile; then
 		: "success"
 	else
 		return 1
 	fi
-	if ${GREP} -q "${PKGNAME}" "$dbfile"; then
+	if ${GREP} -cq "^" "$dbfile"; then
 		describe="$describe: still in $dbfile!"
 		return 1
 	fi
