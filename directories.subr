@@ -45,8 +45,8 @@
 #
 #	    # DIR: <directory> <flags> [<mode> [<user> [<group>]]]
 #
-#	If directory path is relative, then is are assumed to be relative
-#	to ${PKG_PREFIX}.
+#	If directory path is relative, then it is assumed to be relative to
+#	${PKG_PREFIX}.
 #
 #	The third field in each line is set of flags with the following
 #	meaning:
