@@ -94,7 +94,7 @@ _platform_group_exists()
 	[ -f "$groupfile" ] || return 1
 
 	local group_to_gid=
-	lcoal gid_found=
+	local gid_found=
 	local gid_max=0
 	local line save_IFS word1 word3
 	while IFS=: read line; do
