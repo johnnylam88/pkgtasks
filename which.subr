@@ -32,18 +32,20 @@
 #	task_which name [...]
 #
 # DESCRIPTION
-#	The task_which function takes a list of names and looks for the files
-#	which would be executed had these names been given as commands.  Each
-#	argument is search for along the $PATH.
+#	The task_which function takes a list of names and looks for the
+#	files which would be executed had these names been given as
+#	commands.  Each directory in the $PATH is searched, in order,
+#	for each name.
 #
 # RETURN VALUES
-#	The task_which function returns 0 if all command are found, and >0
-#	otherwise.
+#	The task_which function returns 0 if all commandss are found,
+#	and >0 otherwise.
 #
 # ENVIRONMENT
 #	The following variables are used if they are set:
 #
-#	PATH	A colon-separated list of directories to search for commands.
+#	PATH	A colon-separated list of directories to search for
+#		commands.
 #
 
 __task_which__="yes"
