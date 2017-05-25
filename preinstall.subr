@@ -69,20 +69,19 @@ task_preinstall()
 	# Require necessary groups and users before actions that may
 	# set permissions.
 	#
-	if task_groups add $stage < $datafile; then
-		: "groups successfully added"
-	elif task_groups check-add $stage < $datafile; then
-		: "groups already exist"
+	task_groups add $stage < $datafile
+	if task_groups check-add $stage < $datafile; then
+		: "groups exist"
 	else
-		# Errors when creating groups are fatal.
+		# Fatal error: groups are missing.
 		return 1
 	fi
-	if task_users add $stage < $datafile; then
-		: "users successfully added"
-	elif task_users check-add $stage < $datafile; then
-		: "users already exist"
+
+	task_users add $stage < $datafile
+	if task_users check-add $stage < $datafile; then
+		: "users exist"
 	else
-		# Errors when creating users are fatal.
+		# Fatal error: users are missing.
 		return 1
 	fi
 
@@ -97,7 +96,7 @@ task_preinstall()
 	if task_function add $stage < $datafile; then
 		: "success"
 	else
-		# Errors from the generic package tasks are fatal.
+		# Fatal error: failures in generic package tasks.
 		return 1
 	fi
 
