@@ -72,6 +72,19 @@
 
 __task_usergroup__="yes"
 
+task_load platform
+
+# Load the correct platform_{group,user}add functions.
+case $(task_platform) in
+DragonFly|FreeBSD)
+	task_load usergroup_FreeBSD ;;
+Linux)	task_load usergroup_Linux ;;
+MirBSD)	task_load usergroup_MirBSD ;;
+NetBSD|SunOS)
+	task_load usergroup_NetBSD ;;
+*)	task_load usergroup_NetBSD ;;
+esac
+
 task_addgroup()
 {
 	local group="$1"

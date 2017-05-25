@@ -27,8 +27,13 @@
 
 task_load quote
 task_load unittest
-task_load usergroup_Linux
 task_load usergroup_mock
+
+# Mock uname() to select usergroup_Linux.subr.
+uname()
+{
+	echo "Linux"
+}
 
 # Mock groupadd and useradd needed for usergroup_Linux.subr.
 groupadd()

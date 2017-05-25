@@ -26,8 +26,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 task_load unittest
-task_load usergroup_NetBSD
 task_load usergroup_mock
+
+# Mock uname() to select usergroup_NetBSD.subr.
+uname()
+{
+	# SunOS also uses usergroup_NetBSD.subr.
+	echo "SunOS"
+}
 
 # Mock groupadd and useradd needed for usergroup_NetBSD.subr
 groupadd()

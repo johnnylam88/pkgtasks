@@ -25,9 +25,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# Mock uname() to select usergroup_MirBSD.subr.
+uname()
+{
+	echo "MirBSD"
+}
+
 task_load unittest
 task_load usergroup
-task_load usergroup_MirBSD
 
 test_setup()
 {

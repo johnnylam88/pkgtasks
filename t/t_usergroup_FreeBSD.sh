@@ -26,8 +26,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 task_load unittest
-task_load usergroup_FreeBSD
 task_load usergroup_mock
+
+# Mock uname to select usergroup_FreeBSD.subr.
+uname()
+{
+	# DragonFly also uses usergroup_FreeBSD.subr.
+	echo "DragonFly"
+}
 
 # Mock pw needed for usergroup_FreeBSD.subr.
 pw()
