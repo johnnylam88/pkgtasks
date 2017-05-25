@@ -62,6 +62,7 @@ dist_pkgdata_DATA += maketemp.subr
 dist_pkgdata_DATA += match.subr
 dist_pkgdata_DATA += ocaml_findlib.subr
 dist_pkgdata_DATA += permissions.subr
+dist_pkgdata_DATA += platform.subr
 dist_pkgdata_DATA += postinstall.subr
 dist_pkgdata_DATA += postremove.subr
 dist_pkgdata_DATA += preinstall.subr
@@ -237,6 +238,14 @@ EXTRA_DIST += t/t_permissions.sh
 t/t_permissions: t/t_permissions.sh $(builddir)/t/build_test
 	-$(MKDIR_P) $(builddir)/t
 	$(AM_V_GEN)target="$(builddir)/t/t_permissions" source="$(srcdir)/t/t_permissions.sh"; \
+	$(BUILD_TEST)
+
+pkgtests_SCRIPTS += t/t_platform
+CLEANFILES += t/t_platform
+EXTRA_DIST += t/t_platform.sh
+t/t_platform: t/t_platform.sh $(builddir)/t/build_test
+	-$(MKDIR_P) $(builddir)/t
+	$(AM_V_GEN)target="$(builddir)/t/t_platform" source="$(srcdir)/t/t_platform.sh"; \
 	$(BUILD_TEST)
 
 pkgtests_SCRIPTS += t/t_postinstall

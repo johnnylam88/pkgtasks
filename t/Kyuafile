@@ -29,6 +29,7 @@ tap_test_program { name = "t_maketemp" }
 tap_test_program { name = "t_match" }
 tap_test_program { name = "t_ocaml_findlib" }
 tap_test_program { name = "t_permissions" }
+tap_test_program { name = "t_platform" }
 tap_test_program { name = "t_postinstall" }
 tap_test_program { name = "t_postremove" }
 tap_test_program { name = "t_preinstall" }

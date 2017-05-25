@@ -81,6 +81,7 @@ scripts:
   * `makedir`: make a directory hierarchy
   * `maketemp`: make unique, temporary files
   * `match`: match lines with a fnmatch(3) glob pattern
+  * `platform`: determine the platform (operating system)
   * `quote`: quote strings for use with shell eval
   * `random`: generate random numbers (badly)
   * `refcount`: reference-count system resources
