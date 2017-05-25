@@ -443,14 +443,13 @@ platform_useradd()
 			fi
 		fi
 		# Get the group ID of the user to be added.
-		if [ $group -gt 0 ]; then
-			: "$group is a GID"
-		else
-			# $group is a name.
+		case $group in
+		""|*[!0-9]*)
+			# $group is not a GID
 			platform_groupadd "$group"
 			_platform_group_exists "$group" || result=1
-			group=$_exists_gid
-		fi
+			group=$_exists_gid ;;
+		esac
 	fi
 	if [ $result -eq 0 ]; then
 		# Add the user and user ID to the database.
