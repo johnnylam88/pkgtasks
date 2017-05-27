@@ -2,6 +2,40 @@ Package Tasks
 =============
 
 
+Changes in version 1.6
+----------------------
+**Released on 2017-05-27.**
+
+* Adjust `fonts` task to run `mkfontdir` on TTF and Type1 font
+  directories automatically.
+
+* Rename control variable `PKG_RCD_SCRIPTS` to `PKG_INIT_SCRIPTS`.
+  This generalizes the variable name to allow for other init
+  systems.
+
+* Check `${PKG_CONFIG_PERMS}` in the `permissions` task.
+
+* Make the `shlibs` task accept `LDCONFIG_ADD_CMD` and
+  `LDCONFIG_REMOVE_CMD` as separate command lines to update the
+  shared library cache depending on whether the task is called to
+  *add* or *remove*.  The default action is still to invoke a bare
+  `${LDCONFIG}` command.
+
+* Adjust the `shlibs` task to accept standard input and to only
+  update the cache if there are lines of the correct format.
+
+* Fix `preinstall` meta-task to fail properly if groups and/or
+  users don't exist.
+
+* Add `platform` task to write the name of the platform or
+  operating system to standard output.
+
+* Automatically load the platform-specific module with the correct
+  `platform_groupadd` and `platform_useradd` functions.
+
+* Bug fixes and cleanup.
+
+
 Changes in version 1.5
 ----------------------
 **Released on 2017-05-17.**
