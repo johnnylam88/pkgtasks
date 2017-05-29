@@ -2,6 +2,21 @@ Package Tasks
 =============
 
 
+Changes in version 1.7
+----------------------
+**Released on 2017-05-29.**
+
+* Back out two changes to make **pkgtasks** more compatible with
+  what **pkgsrc** needs:
+
+  - Don't use `OCAML_FINDLIB_REGISTER` environment variable since
+    it is a package-settable variable in **pkgsrc**, not a user-
+    settable one.
+
+  - Don't use `PKG_CONFIG_PERMS` environment variable in the
+    `permissions` task, which matches its usage in **pkgrsc**
+
+
 Changes in version 1.6
 ----------------------
 **Released on 2017-05-27.**
