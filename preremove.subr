@@ -79,7 +79,7 @@ task_preremove()
 	task_files remove $stage < $datafile
 
 	# Run the generic package tasks.
-	if task_sort -r $datafile | task_function remove $stage; then
+	if task_sort -r < $datafile | task_function remove $stage; then
 		: "success"
 	else
 		# Errors from the generic package tasks are fatal.
