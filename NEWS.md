@@ -2,6 +2,17 @@ Package Tasks
 =============
 
 
+Changes in version 1.8
+----------------------
+**Released on 2017-05-29.**
+
+* Change the output of the actions taken by each task, by being
+  slightly more brief, and also accepting an environment variable
+  `${TASK_MSG}` as the prefix string for each line of output.
+
+* Bug fixes.
+
+
 Changes in version 1.7
 ----------------------
 **Released on 2017-05-29.**
