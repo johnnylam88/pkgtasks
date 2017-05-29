@@ -83,6 +83,10 @@
 #		The installation prefix of the package.  The default is
 #		"/usr/pkg".
 #
+#	TASK_MSG
+#		String prepended to all normal message written to
+#		standard output.
+#
 
 __task_shlibs__="yes"
 
@@ -95,6 +99,7 @@ task_shlibs()
 	: ${LDCONFIG_REMOVE_CMD:=_task_shlibs_run}
 
 	: ${PKGNAME:=${0##*/}}
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -111,7 +116,7 @@ task_shlibs()
 	local action="$1"; shift
 	case $action in
 	add|remove)
-		$echo -bc "  > ${PKGNAME}: run-time library search paths" ;;
+		: "valid actions" ;;
 	*)	return 0 ;;
 	esac
 
@@ -159,9 +164,9 @@ task_shlibs()
 			result=1 ;;
 	esac
 	if [ $result -eq 0 ]; then
-		$echo "    > database rebuilt"
+		$echo "${TASK_MSG}> database rebuilt"
 	else
-		$echo "    ! database not rebuilt"
+		$echo "${TASK_MSG}! database not rebuilt"
 	fi
 	return $result
 }

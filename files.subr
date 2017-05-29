@@ -120,6 +120,10 @@
 #
 #	RM	The name or path to the rm(1) utility.
 #
+#	TASK_MSG
+#		String prepended to all normal message written to
+#		standard output.
+#
 
 __task_files__="yes"
 
@@ -141,6 +145,7 @@ task_files()
 	: ${PKG_CONFIG:=yes}
 	: ${PKG_CONFIG_PERMS:=yes}
 	: ${PKG_INIT_SCRIPTS:=yes}
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -156,9 +161,7 @@ task_files()
 
 	local action="$1"; shift
         case $action in
-	add|remove|perms)
-		$echo -bc "  > ${PKGNAME}: files" ;;
-	check-add|check-remove|check-perms)
+	add|remove|perms|check-add|check-remove|check-perms)
 		: "valid actions" ;;
 	*)      return 0 ;;
 	esac
@@ -275,27 +278,27 @@ task_files()
 					if [ -z "$refcount" ]; then
 						task_refcount prop_put files "$path" preexist || line_result=1
 					fi
-					$echo "    ! file already exists: $d_path"
+					$echo "${TASK_MSG}! file already exists: $d_path"
 				elif [ -f "$egfile" -o -c "$egfile" ]; then
 					# Example file exists.
 					if [ -z "$copy" ]; then
 						: "file is never copied"
 					elif [ "$copy" = "seen" ]; then
-						$echo "    ! file copy skipped: $d_path"
+						$echo "${TASK_MSG}! file copy skipped: $d_path"
 					elif ${CP} "$egfile" "$d_path"; then
-						$echo "    > file copied: $d_path"
+						$echo "${TASK_MSG}> file copied: $d_path"
 						changes="$changes copy"
 					else
-						$echo "    ! file not copied: $d_path"
+						$echo "${TASK_MSG}! file not copied: $d_path"
 						line_result=1
 					fi
 				else
-					$echo "    ! file not copied: $d_path"
+					$echo "${TASK_MSG}! file not copied: $d_path"
 					line_result=1
 				fi
 			else
 				# add refcount failed; skip to next line
-				$echo "    ! refcount add failure: files $path"
+				$echo "${TASK_MSG}! refcount add failure: files $path"
 				result=1
 				continue
 			fi ;;
@@ -319,14 +322,14 @@ task_files()
 				add|perms)
 					task_refcount prop_put files "$path" permissions "$mode" "$user" "$group" || line_result=1
 					if [ ! -f "$d_path" ]; then
-						$echo "    ! file permissions not set on missing: $msg"
+						$echo "${TASK_MSG}! file permissions not set on missing: $msg"
 						line_result=1
 					elif [ -z "$pkg_config_perms" ]; then
-						$echo "    ! file permissions skipped: $msg"
+						$echo "${TASK_MSG}! file permissions skipped: $msg"
 					elif task_set_permissions "$d_path" "$mode" "$user" "$group"; then
-						$echo "    > file permissions set: $msg"
+						$echo "${TASK_MSG}> file permissions set: $msg"
 					else
-						$echo "    ! file permissions not set: $msg"
+						$echo "${TASK_MSG}! file permissions not set: $msg"
 						line_result=1
 					fi ;;
 				check-add|check-perms)
@@ -355,24 +358,24 @@ task_files()
 							if task_compare "$d_path" "$egfile"; then
 								if [ "$remove" = "yes" ]; then
 									if ${RM} -f "$d_path"; then
-										$echo "    > file removed: $d_path"
+										$echo "${TASK_MSG}> file removed: $d_path"
 									else
 										line_result=1
 									fi
 								fi
 							else
-								$echo "    ! file differs from default: $d_path"
+								$echo "${TASK_MSG}! file differs from default: $d_path"
 							fi
 						fi
 						if [ -f "$d_path" ]; then
-							$echo "    ! file not removed: $d_path"
+							$echo "${TASK_MSG}! file not removed: $d_path"
 						fi
 						# delete the reference count
 						task_refcount delete files "$path"
 					fi
 				else
 					# remove refcount failed
-					$echo "    ! refcount remove failure: files $path"
+					$echo "${TASK_MSG}! refcount remove failure: files $path"
 					line_result=1
 				fi ;;
 			check-remove)

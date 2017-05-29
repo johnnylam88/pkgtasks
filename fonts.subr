@@ -86,6 +86,10 @@
 #
 #	RMDIR	The name or path to the rmdir(1) utility.
 #
+#	TASK_MSG
+#		String prepended to all normal message written to
+#		standard output.
+#
 #	TTMKFDIR
 #		The name or path to the ttmkfdir(1) utility.
 #
@@ -109,6 +113,7 @@ task_fonts()
 	: ${PKGNAME:=${0##*/}}
 
 	: ${PKG_UPDATE_FONTS_DB:=yes}
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -126,7 +131,6 @@ task_fonts()
 	local action="$1"; shift
 	case $action in
 	add|remove)
-		$echo -bc "  > ${PKGNAME}: font indices"
 		: "valid actions" ;;
 	*)	return 0 ;;
 	esac
@@ -172,7 +176,7 @@ task_fonts()
 		encodings_dir="${PKG_DESTDIR}$encodings_dir"
 
 		if [ ! -d "$fontdir" ]; then
-			$echo "    ! fonts directory missing: $fontdir"
+			$echo "${TASK_MSG}! fonts directory missing: $fontdir"
 			result=1
 			continue
 		fi
@@ -194,9 +198,9 @@ task_fonts()
 			esac
 		fi
 		if [ -n "$update_fonts" -a $line_result -eq 0 ]; then
-			$echo "    > fonts index rebuilt: $fontdir"
+			$echo "${TASK_MSG}> fonts index rebuilt: $fontdir"
 		else
-			$echo "    ! fonts index not rebuilt: $fontdir"
+			$echo "${TASK_MSG}! fonts index not rebuilt: $fontdir"
 		fi
 
 		[ $line_result -eq 0 ] || result=1
@@ -210,6 +214,8 @@ _task_fonts_index_ttf()
 {
 	: ${MKFONTSCALE:=mkfontscale}
 	: ${TTMKFDIR:=ttmkfdir}
+
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -249,7 +255,7 @@ _task_fonts_index_ttf()
 		elif [ -n "${TTMKFDIR}" ]; then
 			command=${TTMKFDIR}
 		else
-			$echo "    ! ttf-indexing command missing"
+			$echo "${TASK_MSG}! ttf-indexing command missing"
 			return 1
 		fi
 	fi
@@ -263,6 +269,8 @@ _task_fonts_index_type1()
 {
 	: ${MKFONTSCALE:=mkfontscale}
 	: ${TYPE1INST:=type1inst}
+
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -302,7 +310,7 @@ _task_fonts_index_type1()
 		elif [ -n "${TYPE1INST}" ]; then
 			command=${TTMKFDIR}
 		else
-			$echo "    ! type1-indexing command missing"
+			$echo "${TASK_MSG}! type1-indexing command missing"
 			return 1
 		fi
 	fi
@@ -315,6 +323,8 @@ _task_fonts_index_type1()
 _task_fonts_index_x11()
 {
 	: ${MKFONTDIR:=mkfontdir}
+
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -343,7 +353,7 @@ _task_fonts_index_x11()
 	elif [ -n "${MKFONTDIR}" ]; then
 		command=${MKFONTDIR}
 	else
-		$echo "    ! x11-indexing command missing"
+		$echo "${TASK_MSG}! x11-indexing command missing"
 		return 1
 	fi
 	if [ -n "$encodings_dir" ]; then
@@ -358,6 +368,8 @@ _task_fonts_cleanup()
 {
 	: ${RM:=rm}
 	: ${RMDIR:=rmdir}
+
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -396,7 +408,7 @@ _task_fonts_cleanup()
 				"$fontdir/fonts.scale" \
 				"$fontdir/Fontmap"*
 			${RMDIR} -p "$fontdir" 2>/dev/null
-			$echo "    > empty fonts directory removed: $fontdir"
+			$echo "${TASK_MSG}> empty fonts directory removed: $fontdir"
 		fi
 	done
 	__task_fonts_dirs__=

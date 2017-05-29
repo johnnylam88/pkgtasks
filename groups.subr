@@ -82,6 +82,10 @@
 #		"add" and "remove" actions are allowed to create and
 #		remove groups from the system.
 #
+#	TASK_MSG
+#		String prepended to all normal message written to
+#		standard output.
+#
 
 __task_groups__="yes"
 __task_groups_init__="_task_groups_init"
@@ -98,6 +102,7 @@ task_groups()
 {
 	: ${PKGNAME:=${0##*/}}
 	: ${PKG_CREATE_USERGROUP:=yes}
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -113,9 +118,7 @@ task_groups()
 
 	local action="$1"; shift
 	case $action in
-	add|remove)
-		$echo -bc "  > ${PKGNAME}: groups" ;;
-	check-add|check-remove)
+	add|remove|check-add|check-remove)
 		: "valid action" ;;
 	*)	return 0 ;;
 	esac
@@ -154,28 +157,28 @@ task_groups()
 				task_group_exists "$group" "$gid"
 				case $? in
 				0)	# $group exists and has gid $gid
-					$echo "    ! group already exists: $msg" ;;
+					$echo "${TASK_MSG}! group already exists: $msg" ;;
 				1)	# neither $group nor $gid exist
 					if [ -z "$create" ]; then
-						$echo "    ! group creation skipped: $msg"
+						$echo "${TASK_MSG}! group creation skipped: $msg"
 					elif task_addgroup "$group" "$gid"; then
-						$echo "    > group created: $msg"
+						$echo "${TASK_MSG}> group created: $msg"
 						# Keep track of groups added in case of error later.
 						task_quote "$group"
 						__task_groups_error__="$__task_groups_error__ $_quoted"
 					else
-						$echo "    ! group not created: $msg"
+						$echo "${TASK_MSG}! group not created: $msg"
 						line_result=1
 					fi ;;
-				2)	$echo "    ! group conflict: $msg"
+				2)	$echo "${TASK_MSG}! group conflict: $msg"
 					result=1
 					break ;;
-				*)	$echo "    ! group not created: $msg"
+				*)	$echo "${TASK_MSG}! group not created: $msg"
 					line_result=1 ;;
 				esac
 			else
 				# add refcount failed; skip to next line
-				$echo "    ! refcount add failure: groups $msg"
+				$echo "${TASK_MSG}! refcount add failure: groups $msg"
 				result=1
 				continue
 			fi ;;
@@ -188,7 +191,7 @@ task_groups()
 				fi
 			else
 				# remove refcount failed
-				$echo "    ! refcount remove failure: groups $msg"
+				$echo "${TASK_MSG}! refcount remove failure: groups $msg"
 				line_result=1
 			fi ;;
 		check-add)

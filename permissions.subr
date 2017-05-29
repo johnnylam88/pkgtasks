@@ -91,6 +91,10 @@
 #		The installation prefix of the package.  The default is
 #		"/usr/pkg".
 #
+#	TASK_MSG
+#		String prepended to all normal message written to
+#		standard output.
+#
 
 __task_permissions__="yes"
 
@@ -156,6 +160,8 @@ task_permissions()
 	: ${PKG_PREFIX:=/usr/pkg}
 	: ${PKGNAME:=${0##*/}}
 
+	: ${TASK_MSG=""}
+
 	local arg
 	local echo="task_echo"
 	local OPTIND=1
@@ -170,8 +176,7 @@ task_permissions()
 
 	local action="$1"; shift
 	case $action in
-	add)	$echo -bc "  > ${PKGNAME}: special permissions" ;;
-	check-add)
+	add|check-add)
 		: "valid options" ;;
 	*)	return 0 ;;
 	esac
@@ -217,12 +222,12 @@ task_permissions()
 
 		case "$action" in
 		add)	if [ ! -e "$path" ]; then
-				$echo "    ! permissions not set on missing: $path"
+				$echo "${TASK_MSG}! permissions not set on missing: $path"
 				result=1
 			elif task_set_permissions "$path" "$mode" "$user" "$group"; then
-				$echo "    > permissions set: $msg"
+				$echo "${TASK_MSG}> permissions set: $msg"
 			else
-				$echo "    ! permissions not set: $msg"
+				$echo "${TASK_MSG}! permissions not set: $msg"
 				result=1
 			fi ;;
 		check-add)

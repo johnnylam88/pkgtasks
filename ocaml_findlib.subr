@@ -91,6 +91,10 @@
 #
 #	RM	The name or path to the rm(1) utility.
 #
+#	TASK_MSG
+#		String prepended to all normal message written to
+#		standard output.
+#
 
 __task_ocaml_findlib__="yes"
 __task_ocaml_findlib_init__="_task_ocaml_findlib_init"
@@ -109,6 +113,7 @@ task_ocaml_findlib()
 	: ${OCAML_SITELIB:=lib/ocaml/site-lib}
 	: ${PKG_PREFIX:=/usr/pkg}
 	: ${PKGNAME:=${0##*/}}
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -124,9 +129,7 @@ task_ocaml_findlib()
 
 	local action="$1"; shift
 	case $action in
-	add|remove)
-		$echo -bc "  > ${PKGNAME}: ocaml library search paths" ;;
-	check-add|check-remove)
+	add|remove|check-add|check-remove)
 		: "valid actions" ;;
 	*)	return 0 ;;
 	esac
@@ -183,7 +186,7 @@ task_ocaml_findlib()
 		if [ $line_result -eq 0 ]; then
 			case $action in
 			add)	if [ -f "$ldconf" ] && task_match -qw "$libdir" < $ldconf; then
-					$echo "    ! path already added: $libdir"
+					$echo "${TASK_MSG}! path already added: $libdir"
 				else
 					temp=$( task_maketemp "$ldconf.pkgtasks.XXXXXXXXXX" )
 					if [ -n "$temp" ]; then
@@ -198,14 +201,14 @@ task_ocaml_findlib()
 						fi > $temp
 						# rename(2) is atomic.
 						if ${MV} -f "$temp" "$ldconf"; then
-							$echo "    > path added: $libdir"
+							$echo "${TASK_MSG}> path added: $libdir"
 							__task_ocaml_findlib_temps__=${__task_ocaml_findlib_temps__% $temp_quoted}
 						else
-							$echo "    ! path not added: $libdir"
+							$echo "${TASK_MSG}! path not added: $libdir"
 							line_result=1
 						fi
 					else
-						$echo "    ! cannot create temporary file for $ldconf"
+						$echo "${TASK_MSG}! cannot create temporary file for $ldconf"
 						line_result=1
 					fi
 				fi ;;
@@ -218,18 +221,18 @@ task_ocaml_findlib()
 						task_match -vw "$libdir" < $ldconf > $temp
 						# rename(2) is atomic.
 						if ${MV} -f "$temp" "$ldconf"; then
-							$echo "    > path removed: $libdir"
+							$echo "${TASK_MSG}> path removed: $libdir"
 							__task_ocaml_findlib_temps__=${__task_ocaml_findlib_temps__% $temp_quoted}
 						else
-							$echo "    ! path not removed: $libdir"
+							$echo "${TASK_MSG}! path not removed: $libdir"
 							line_result=1
 						fi
 					else
-						$echo "    ! cannot create temporary file for $ldconf"
+						$echo "${TASK_MSG}! cannot create temporary file for $ldconf"
 						line_result=1
 					fi
 				else
-					$echo "    > path already removed: $libdir"
+					$echo "${TASK_MSG}> path already removed: $libdir"
 				fi ;;
 			check-add)
 				if [ -f "$ldconf" ] && task_match -qw "$libdir" < $ldconf; then

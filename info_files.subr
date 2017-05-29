@@ -75,6 +75,10 @@
 #
 #	RMDIR	The name or path to the rmdir(1) utility.
 #
+#	TASK_MSG
+#		String prepended to all normal message written to
+#		standard output.
+#
 
 __task_info_files__="yes"
 __task_info_files_init__="_task_info_files_init"
@@ -93,9 +97,10 @@ task_info_files()
 
 	: ${PKG_PREFIX:=/usr/pkg}
 	: ${PKGNAME:=${0##*/}}
+	: ${TASK_MSG:=""}
 
 	local arg
-	local echo="$echo"
+	local echo="task_echo"
 	local silent=
 	local OPTIND=1
 	while getopts ":s" arg "$@"; do
@@ -110,7 +115,7 @@ task_info_files()
 	local action="$1"; shift
 	case $action in
 	add|remove)
-		$echo -bc "  > ${PKGNAME}: GNU info files" ;;
+		: "valid action" ;;
 	*)	return 0 ;;
 	esac
 
@@ -148,7 +153,7 @@ task_info_files()
 		infodir="${PKG_DESTDIR}$infodir"
 
 		if [ ! -f "$file" ]; then
-			$echo "    ! info file missing: $file"
+			$echo "${TASK_MSG}! info file missing: $file"
 			result=1
 			continue
 		fi
@@ -170,19 +175,19 @@ task_info_files()
 			[ -d "$infodir" ] || task_makedir "$infodir"
 			${INSTALL_INFO} "$file" "$index" || line_result=1
 			if [ $line_result -eq 0 ]; then
-				$echo "    > info file registered: $file"
+				$echo "${TASK_MSG}> info file registered: $file"
 			else
-				$echo "    ! info file not registered: $file"
+				$echo "${TASK_MSG}! info file not registered: $file"
 			fi ;;
 		remove)	if [ -f "$index" ]; then
 				${INSTALL_INFO} --delete "$file" "$index" || line_result=1
 				if [ $line_result -eq 0 ]; then
-					$echo "    > info file unregistered: $file"
+					$echo "${TASK_MSG}> info file unregistered: $file"
 				else
-					$echo "    ! info file not unregistered: $file"
+					$echo "${TASK_MSG}! info file not unregistered: $file"
 				fi
 			else
-				$echo "    > info file already unregistered: $file"
+				$echo "${TASK_MSG}> info file already unregistered: $file"
 			fi ;;
 		esac
 		[ $line_result -eq 0 ] || result=1
@@ -196,6 +201,8 @@ _task_info_files_cleanup()
 {
 	: ${RM:=rm}
 	: ${RMDIR:=rmdir}
+
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -224,7 +231,7 @@ _task_info_files_cleanup()
 		else
 			${RM} -f "$index"
 			${RMDIR} -p "${index%/*}" 2>/dev/null
-			$echo "    > empty dir file removed: $index"
+			$echo "${TASK_MSG}> empty dir file removed: $index"
 		fi
 	done
 	__task_info_files_indices__=

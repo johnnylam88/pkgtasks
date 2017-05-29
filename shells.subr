@@ -90,6 +90,10 @@
 #
 #	RM	The name or path to the rm(1) utility.
 #
+#	TASK_MSG
+#		String prepended to all normal message written to
+#		standard output.
+#
 
 __task_shells__="yes"
 __task_shells_init__="_task_shells_init"
@@ -110,6 +114,7 @@ task_shells()
 	: ${PKGNAME:=${0##*/}}
 
 	: ${PKG_REGISTER_SHELLS:=yes}
+	: ${TASK_MSG:=""}
 
 	local arg
 	local echo="task_echo"
@@ -125,9 +130,7 @@ task_shells()
 
 	local action="$1"; shift
 	case $action in
-	add|remove)
-		$echo -bc "  > ${PKGNAME}: shells" ;;
-	check-add|check-remove)
+	add|remove|check-add|check-remove)
 		: "valid actions" ;;
 	*)	return 0 ;;
 	esac
@@ -182,7 +185,7 @@ task_shells()
 			case $action in
 			add)	if [ -n "$register_shells" ]; then
 					if [ -f "$shelldb" ] && task_match -qw "$shell" < $shelldb; then
-						$echo "    ! shell already added: $shell"
+						$echo "${TASK_MSG}! shell already added: $shell"
 					else
 						temp=$( task_maketemp "$shelldb.pkgtasks.XXXXXXXXXX" )
 						if [ -n "$temp" ]; then
@@ -197,14 +200,14 @@ task_shells()
 							fi > $temp
 							# rename(2) is atomic.
 							if ${MV} -f "$temp" "$shelldb"; then
-								$echo "    > shell added: $shell"
+								$echo "${TASK_MSG}> shell added: $shell"
 								__task_shells_temps__=${__task_shells_temps__% $temp_quoted}
 							else
-								$echo "    ! shell not added: $shell"
+								$echo "${TASK_MSG}! shell not added: $shell"
 								line_result=1
 							fi
 						else
-							$echo "    ! cannot create temporary file for $shelldb"
+							$echo "${TASK_MSG}! cannot create temporary file for $shelldb"
 							line_result=1
 						fi
 					fi
@@ -219,18 +222,18 @@ task_shells()
 							task_match -vw "$shell" < $shelldb > $temp
 							# rename(2) is atomic.
 							if ${MV} -f "$temp" "$shelldb"; then
-								$echo "    > shell removed: $shell"
+								$echo "${TASK_MSG}> shell removed: $shell"
 								__task_shells_temps__=${__task_shells_temps__% $temp_quoted}
 							else
-								$echo "    ! shell not removed: $shell"
+								$echo "${TASK_MSG}! shell not removed: $shell"
 								line_result=1
 							fi
 						else
-							$echo "    ! cannot create temporary file for $shelldb"
+							$echo "${TASK_MSG}! cannot create temporary file for $shelldb"
 							line_result=1
 						fi
 					else
-						$echo "    ! shell already removed: $shell"
+						$echo "${TASK_MSG}! shell already removed: $shell"
 					fi
 				fi ;;
 			check-add)
