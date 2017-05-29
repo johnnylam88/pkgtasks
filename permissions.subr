@@ -82,11 +82,6 @@
 #	PKGNAME
 #		The name of the package.
 #
-#	PKG_CONFIG_PERMS
-#		If ${PKG_CONFIG_PERMS} is a "truthy" value, then the
-#		"add" action is allowed to modify ownership and file
-#		mode of files.
-#
 #	PKG_DESTDIR
 #		A "destdir" prefix that is prepended to all filesystem
 #		paths.  The default value is the empty string.  This
@@ -100,7 +95,6 @@
 __task_permissions__="yes"
 
 task_load echo
-task_load truthy
 
 task_set_permissions()
 {
@@ -162,8 +156,6 @@ task_permissions()
 	: ${PKG_PREFIX:=/usr/pkg}
 	: ${PKGNAME:=${0##*/}}
 
-	: ${PKG_CONFIG_PERMS:=yes}
-
 	local arg
 	local echo="task_echo"
 	local OPTIND=1
@@ -190,9 +182,6 @@ task_permissions()
 	//)	prefix= ;;
 	*)	prefix=${PKG_PREFIX} ;;
 	esac
-
-	local pkg_config_perms="yes"
-	task_is_truthy "${PKG_CONFIG_PERMS}" || pkg_config_perms=
 
 	local result
 	local msg
@@ -230,8 +219,6 @@ task_permissions()
 		add)	if [ ! -e "$path" ]; then
 				$echo "    ! permissions not set on missing: $path"
 				result=1
-			elif [ -z "$pkg_config_perms" ]; then
-				$echo "    ! permissions skipped: $msg"
 			elif task_set_permissions "$path" "$mode" "$user" "$group"; then
 				$echo "    > permissions set: $msg"
 			else
