@@ -35,6 +35,7 @@ test_setup()
 	: ${CMP:=cmp}
 
 	${CAT} > data << EOF
+# ( ) junk
 # TASK: hello	# GREET: world one
 # TASK: bye	# FAREWELL: dear one
 # TASK: hello	# GREET: world two

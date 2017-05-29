@@ -99,12 +99,13 @@ task_function()
 
 	# Use AWK to re-sequence the standard input.
 	${AWK} 'BEGIN {
-			hashtag_re="^[[:space:]]*#[[:space:]]+TASK:[[:space:]]+"
+			ws = "[[:space:]]"
+			hashtag_re = "^" ws "*#" ws "+TASK:" ws "+"
 		}
-		hashtag_re {
+		match( $0, hashtag_re ) > 0 {
 			name = $3
-			if ( length(name) > 0 ) {
-				sub(hashtag_re name "[[:space:]]+", "")
+			if ( length( name ) > 0 ) {
+				sub( hashtag_re name ws "+", "" )
 				n = ( name in max_line ) ? max_line[name] + 1 : 1
 				max_line[name] = n
 				line[name, n] = $0
