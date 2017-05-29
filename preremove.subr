@@ -52,6 +52,7 @@ __task_preremove__="yes"
 
 task_load files
 task_load info_files
+task_load sort
 task_load taskfunc
 
 task_preremove()
