@@ -112,15 +112,12 @@ task_postremove()
 		esac
 		case $post_fn in
 		task_directories)
-			# Reverse-sort.
+			# Reverse-sort data lines for this task.
 			task_sort -r < $datafile | $post_fn $silent remove $stage ;;
 		*)	$post_fn $silent remove $stage < $datafile ;;
 		esac
-		if [ $? -gt 0 ]; then
-			# Any errors during postremove are non-fatal.
-			post_checks="$post_checks $post_fn"
-			result=1
-		fi
+		[ $? -eq 0 ] || result=1
+		post_checks="$post_checks $post_fn"
 	done
 
 	# Run all checks after all post-removal actions have completed
@@ -130,7 +127,7 @@ task_postremove()
 	for post_fn in $post_checks; do
 		case $post_fn in
 		task_directories)
-			# Reverse-sort.
+			# Reverse-sort data lines for this task.
 			task_sort -r < $datafile | $post_fn check-remove $stage ;;
 		*)	$post_fn check-remove $stage < $datafile ;;
 		esac

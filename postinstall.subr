@@ -109,12 +109,8 @@ task_postinstall()
 			silent= ;;
 		*)	silent="-s" ;;
 		esac
-		if $post_fn $silent add $stage < $datafile; then
-			: "success"
-		else
-			post_checks="$post_checks $post_fn"
-			result=1
-		fi
+		$post_fn $silent add $stage < $datafile || result=1
+		post_checks="$post_checks $post_fn"
 	done
 
 	# Run all checks after all post-installation actions have completed
@@ -124,7 +120,7 @@ task_postinstall()
 	for post_fn in $post_checks; do
 		case $post_fn in
 		task_directories)
-			# Sort
+			# Sort data lines for this task.
 			task_sort < $datafile | $post_fn check-add $stage ;;
 		*)	$post_fn check-add $stage < $datafile ;;
 		esac
