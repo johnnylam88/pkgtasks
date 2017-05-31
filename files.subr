@@ -323,8 +323,12 @@ task_files()
 					task_refcount prop_put files "$path" permissions "$mode" "$user" "$group" || line_result=1
 					if [ ! -f "$d_path" ]; then
 						$echo "${TASK_MSG}! file permissions not set on missing: $msg"
-						line_result=1
-					elif [ -z "$pkg_config_perms" ]; then
+						if [ "$copy" = "yes" ]; then
+							# The should have been copied; otherwise, it's an error.
+							line_result=1
+						fi
+					elif [ "$action" = "perms" -a -z "$pkg_config_perms" ]; then
+						# "perms" action, but PKG_CONFIG_PERMS is not truthy.
 						$echo "${TASK_MSG}! file permissions skipped: $msg"
 					elif task_set_permissions "$d_path" "$mode" "$user" "$group"; then
 						$echo "${TASK_MSG}> file permissions set: $msg"
