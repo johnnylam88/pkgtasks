@@ -418,7 +418,7 @@ test11()
 test12()
 {
 	describe="copy with permissions"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	if echo "# FILE: \
 		etc/conffile2 c \
 		share/examples/pkg2/conffile2 \

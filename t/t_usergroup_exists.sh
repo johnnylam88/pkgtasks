@@ -50,7 +50,7 @@ test_setup()
 test1()
 {
 	describe="nonexistent group, no groupid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_group_exists $nonexistent_group
 	local result=$?
 	if [ $result -ne 1 ]; then
@@ -63,7 +63,7 @@ test1()
 test2()
 {
 	describe="nonexistent group, nonexistent groupid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_group_exists $nonexistent_group $nonexistent_gid
 	local result=$?
 	if [ $result -ne 1 ]; then
@@ -76,7 +76,7 @@ test2()
 test3()
 {
 	describe="nonexistent group, existent groupid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_group_exists $nonexistent_group $existent_gid
 	local result=$?
 	if [ $result -ne 2 ]; then
@@ -89,7 +89,7 @@ test3()
 test4()
 {
 	describe="existent group, no groupid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_group_exists $existent_group
 	local result=$?
 	if [ $result -ne 0 ]; then
@@ -102,7 +102,7 @@ test4()
 test5()
 {
 	describe="existent group, nonexistent groupid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_group_exists $existent_group $nonexistent_gid
 	local result=$?
 	if [ $result -ne 2 ]; then
@@ -115,7 +115,7 @@ test5()
 test6()
 {
 	describe="existent group, existent groupid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_group_exists $existent_group $existent_gid
 	local result=$?
 	if [ $result -ne 0 ]; then
@@ -128,7 +128,7 @@ test6()
 test7()
 {
 	describe="nonexistent user, no userid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_user_exists $nonexistent_user
 	local result=$?
 	if [ $result -ne 1 ]; then
@@ -141,7 +141,7 @@ test7()
 test8()
 {
 	describe="nonexistent user, nonexistent userid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_user_exists $nonexistent_user $nonexistent_uid
 	local result=$?
 	if [ $result -ne 1 ]; then
@@ -154,7 +154,7 @@ test8()
 test9()
 {
 	describe="nonexistent user, existent userid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_user_exists $nonexistent_user $existent_uid
 	local result=$?
 	if [ $result -ne 2 ]; then
@@ -167,7 +167,7 @@ test9()
 test10()
 {
 	describe="existent user, no userid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_user_exists $existent_user
 	local result=$?
 	if [ $result -ne 0 ]; then
@@ -180,7 +180,7 @@ test10()
 test11()
 {
 	describe="existent user, nonexistent userid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_user_exists $existent_user $nonexistent_uid
 	local result=$?
 	if [ $result -ne 2 ]; then
@@ -193,7 +193,7 @@ test11()
 test12()
 {
 	describe="existent user, existent userid"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_user_exists $existent_user $existent_uid
 	local result=$?
 	if [ $result -ne 0 ]; then

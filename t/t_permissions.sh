@@ -79,7 +79,7 @@ test2()
 test3()
 {
 	describe="change to root/wheel"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	task_createfile file1
 	echo "# PERMS: file1 0600 root wheel" | task_permissions add
 	echo "# PERMS: file1 0600 root wheel" | task_permissions check-add
@@ -141,7 +141,7 @@ test5()
 test6()
 {
 	describe="change to root/wheel with PKG_DESTDIR"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	test_destdir_setup
 	local file="${PKG_DESTDIR}${PKG_PREFIX}/file1"
 	task_createfile "$file"

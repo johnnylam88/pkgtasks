@@ -255,7 +255,7 @@ test10()
 test11()
 {
 	describe="owned dir with permissions"
-	task_requires_root && return 0
+	task_requires_root || return 0
 	if echo "# DIR: etc/pkg1 mo 0700 root wheel" |
 	   task_directories add; then
 		: "success"
