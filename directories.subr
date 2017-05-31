@@ -205,8 +205,10 @@ task_directories()
 
 		# Set owner values if the directory should be owned by this package.
 		owned=
+		dir_msg="directory"
 		case $flags in
 		*o*)	owned="yes"
+			dir_msg="owned directory"
 			if task_refcount prop_exists dirs "$path" owner; then
 				# previous owner detected
 				if task_refcount prop_match dirs "$path" owner; then
@@ -248,30 +250,35 @@ task_directories()
 		add)	refcount="yes"
 			task_refcount exists dirs "$path" || refcount=
 			if task_refcount add dirs "$path"; then
-				if [ -d "$d_path" ]; then
+				if [ -n "$owned" ]; then
+					# Directory is owned by this package.
+					if task_refcount prop_put dirs "$path" owner; then
+						: "directory owner property added"
+					else
+						line_result=1
+					fi
+				fi
+				if [ $line_result -gt 0 ]; then
+					: "skip directory creation"
+				elif [ -d "$d_path" ]; then
 					# Directory already exists.
 					if [ -z "$refcount" ]; then
 						task_refcount prop_put dirs "$path" preexist || line_result=1
 					fi
-					$echo "${TASK_MSG}! directory already exists: $d_path"
+					# Only warn if directory exists if it should be owned.
+					if [ -n "$owned" ]; then
+						$echo "${TASK_MSG}! $dir_msg already exists: $d_path"
+					fi
 				elif [ -z "$makedir" ]; then
 					: "directory is never created"
 				elif [ "$makedir" = "seen" ]; then
-					$echo "${TASK_MSG}! directory creation skipped: $d_path"
+					$echo "${TASK_MSG}! $dir_msg creation skipped: $d_path"
 				elif task_makedir "$d_path"; then
-					$echo "${TASK_MSG}> directory created: $d_path"
+					$echo "${TASK_MSG}> $dir_msg created: $d_path"
 					changes="$changes create"
 				else
-					$echo "${TASK_MSG}! directory not created: $d_path"
+					$echo "${TASK_MSG}! $dir_msg not created: $d_path"
 					line_result=1
-				fi
-				if [ $line_result -eq 0 -a -n "$owned" ]; then
-					# Directory is owned by this package.
-					if task_refcount prop_put dirs "$path" owner; then
-						$echo "${TASK_MSG}> directory is owned by ${PKGNAME}: $path"
-					else
-						line_result=1
-					fi
 				fi
 			else
 				# add refcount failed; skip to next line
@@ -294,14 +301,20 @@ task_directories()
 				add|perms)
 					task_refcount prop_put dirs "$path" permissions "$mode" "$user" "$group" || line_result=1
 					if [ ! -d "$d_path" ]; then
-						$echo "${TASK_MSG}! directory permissions not set on missing: $msg"
-						line_result=1
-					elif [ -z "$pkg_config_perms" ]; then
-						$echo "${TASK_MSG}! directory permissions skipped: $msg"
+						$echo "${TASK_MSG}! $dir_msg permissions not set on missing: $msg"
+						if [ "$makedir" = "yes" ]; then
+							# The directory should have been created; otherwise,
+							# it's an error.
+							#
+							line_result=1
+						fi
+					elif [ "$action" = "perms" -a -z "$pkg_config_perms" ]; then
+						# "perms" action, but PKG_CONFIG_PERMS is not trutyy.
+						$echo "${TASK_MSG}! $dir_msg permissions skipped: $msg"
 					elif task_set_permissions "$d_path" "$mode" "$user" "$group"; then
-						$echo "${TASK_MSG}> directory permissions set: $msg"
+						$echo "${TASK_MSG}> $dir_msg permissions set: $msg"
 					else
-						$echo "${TASK_MSG}! directory permissions not set: $msg"
+						$echo "${TASK_MSG}! $dir_msg permissions not set: $msg"
 						line_result=1
 					fi ;;
 				check-add|check-perms)
@@ -337,9 +350,9 @@ task_directories()
 						# Only warn if the directory is owned by the package.
 						if [ -n "$owned" ]; then
 							if [ -d "$d_path" ]; then
-								$echo "${TASK_MSG}! directory not removed: $d_path"
+								$echo "${TASK_MSG}! $dir_msg not removed: $d_path"
 							else
-								$echo "${TASK_MSG}> directory removed: $d_path"
+								$echo "${TASK_MSG}> $dir_msg removed: $d_path"
 							fi
 						fi
 						# delete the reference count
@@ -357,7 +370,7 @@ task_directories()
 					: "directory already removed"
 				elif [ -n "$removedir" -a -n "$owned" ]; then
 					# Only warn if the directory is owned by the package.
-					task_echo "!!! INFO: ${PKGNAME}: Remove directory: $d_path"
+					task_echo "!!! INFO: ${PKGNAME}: Remove $dir_msg: $d_path"
 					line_result=1
 				fi
 			esac
