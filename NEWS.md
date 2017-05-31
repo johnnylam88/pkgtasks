@@ -2,6 +2,26 @@ Package Tasks
 =============
 
 
+Changes in version 1.9
+----------------------
+**Released on 2017-05-31.**
+
+* Adapt `directories` and `files` tasks to unconditionally set
+  permissions when new objects are created, and to not throw
+  errors if the object is missing because it wasn't created in
+  an earlier step.  This makes the behavior more compatible with
+  pkgsrc.
+
+* Depending on the values of certain environment variables, certain
+  "add" or "remove" actions may not actually perform operations that
+  change the system and still return successfully.  Always run the
+  "check" actions for the corresponding main action so that any
+  warning messages intended for the user are written to standard
+  output.
+
+* Make the `shlibs` task output more descriptive.
+
+
 Changes in version 1.8
 ----------------------
 **Released on 2017-05-29.**
