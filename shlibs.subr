@@ -164,9 +164,9 @@ task_shlibs()
 			result=1 ;;
 	esac
 	if [ $result -eq 0 ]; then
-		$echo "${TASK_MSG}> database rebuilt"
+		$echo "${TASK_MSG}> shared library cache rebuilt"
 	else
-		$echo "${TASK_MSG}! database not rebuilt"
+		$echo "${TASK_MSG}! shared library cache not rebuilt"
 	fi
 	return $result
 }
