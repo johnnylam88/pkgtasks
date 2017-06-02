@@ -209,7 +209,7 @@ gen_tests()
 			# version.subr has its own target
 			depend="$depend version.subr" ;;
 		esac
-		depend="$depend \$(builddir)/t/build_test"
+		depend="$depend t/build_test"
 		${CAT} << EOF
 $target: $depend
 	-\$(MKDIR_P) \$(builddir)$dir
