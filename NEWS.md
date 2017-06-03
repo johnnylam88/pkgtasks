@@ -2,6 +2,20 @@ Package Tasks
 =============
 
 
+Changes in version 1.10
+-----------------------
+**Released on 2017-06-03.**
+
+* Modify Makefile.am to always use the same pathname to refer to a
+  built object.  This fixes the dependency graph in the case where
+  make(1) is invoked to run with multiple jobs.
+
+* Change the output of the `directories` and `files` tasks to be
+  less verbose in the most common case where a directory is
+  created or a file is copied and permissions are immediately set
+  on the directory or file.
+
+
 Changes in version 1.9
 ----------------------
 **Released on 2017-05-31.**
