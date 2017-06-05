@@ -25,7 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-doc_DATA = AUTHORS COPYING README.md
+doc_DATA = AUTHORS COPYING NEWS.md README.md
 noinst_DATA = README.md
 EXTRA_DIST = $(doc_DATA)
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4
@@ -492,3 +492,15 @@ else  # HAVE_KYUA
 check-local: check-run-tests
 installcheck-local: installcheck-run-tests
 endif # HAVE_KYUA
+
+# Duplicate Automake's check-news target, but verify NEWS.md instead of NEWS.
+dist-hook: check-news-local
+PHONY_TARGETS += check-news-local
+check-news-local:
+	@newsfile="$(srcdir)/NEWS.md"; \
+	case `sed 15q "$$newsfile"` in \
+	*"$(VERSION)"*) : ;; \
+	*) \
+		echo "$$newsfile not updated; not releasing" 1>&2; \
+		exit 1;; \
+	esac

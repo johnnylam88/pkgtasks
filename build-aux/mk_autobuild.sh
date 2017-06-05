@@ -99,7 +99,7 @@ gen_doc()
 {
 	: ${CAT:=cat}
 
-	gen_append_var doc_DATA AUTHORS COPYING README.md
+	gen_append_var doc_DATA AUTHORS COPYING NEWS.md README.md
 	gen_append_var noinst_DATA README.md
 	gen_append_var EXTRA_DIST "\$(doc_DATA)"
 	gen_append_var MAINTAINERCLEANFILES Makefile.in aclocal.m4
@@ -276,6 +276,18 @@ else  # HAVE_KYUA
 check-local: check-run-tests
 installcheck-local: installcheck-run-tests
 endif # HAVE_KYUA
+
+# Duplicate Automake's check-news target, but verify NEWS.md instead of NEWS.
+dist-hook: check-news-local
+PHONY_TARGETS += check-news-local
+check-news-local:
+	@newsfile="$(srcdir)/NEWS.md"; \
+	case `sed 15q "$$newsfile"` in \
+	*"$(VERSION)"*) : ;; \
+	*) \
+		echo "$$newsfile not updated; not releasing" 1>&2; \
+		exit 1;; \
+	esac
 EOF
 }
 
