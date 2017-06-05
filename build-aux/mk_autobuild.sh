@@ -102,6 +102,9 @@ gen_doc()
 	gen_append_var doc_DATA AUTHORS COPYING README.md
 	gen_append_var noinst_DATA README.md
 	gen_append_var EXTRA_DIST "\$(doc_DATA)"
+	gen_append_var MAINTAINERCLEANFILES Makefile.in aclocal.m4
+	gen_append_var MAINTAINERCLEANFILES build-aux/install-sh build-aux/missing
+	gen_append_var MAINTAINERCLEANFILES configure "\$(DIST_ARCHIVES)"
 }
 
 gen_build()
@@ -276,18 +279,6 @@ endif # HAVE_KYUA
 EOF
 }
 
-gen_clean()
-{
-	: ${CAT:=cat}
-
-	${CAT} << 'EOF'
-maintainer-clean-local:
-	-rm -f Makefile.in aclocal.m4 configure
-	-rm -f build-aux/install-sh build-aux/missing
-	-rm -f $(PACKAGE)-*.tar.*
-EOF
-}
-
 generate()
 {
 	gen_license
@@ -301,8 +292,6 @@ generate()
 	gen_tests
 	echo
 	gen_check
-	echo
-	gen_clean
 }
 
 invoke_autoreconf=

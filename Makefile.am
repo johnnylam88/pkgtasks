@@ -28,6 +28,9 @@
 doc_DATA = AUTHORS COPYING README.md
 noinst_DATA = README.md
 EXTRA_DIST = $(doc_DATA)
+MAINTAINERCLEANFILES = Makefile.in aclocal.m4
+MAINTAINERCLEANFILES += build-aux/install-sh build-aux/missing
+MAINTAINERCLEANFILES += configure $(DIST_ARCHIVES)
 
 PHONY_TARGETS = 
 
@@ -489,8 +492,3 @@ else  # HAVE_KYUA
 check-local: check-run-tests
 installcheck-local: installcheck-run-tests
 endif # HAVE_KYUA
-
-maintainer-clean-local:
-	-rm -f Makefile.in aclocal.m4 configure
-	-rm -f build-aux/install-sh build-aux/missing
-	-rm -f $(PACKAGE)-*.tar.*
