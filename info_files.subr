@@ -172,8 +172,11 @@ task_info_files()
 				${INSTALL_INFO} --delete "$file" "$index" >/dev/null 2>&1
 			fi
 			# Add the file entry to the "dir" file.
-			[ -d "$infodir" ] || task_makedir "$infodir"
-			${INSTALL_INFO} "$file" "$index" || line_result=1
+			[ -d "$infodir" ] || task_makedir "$infodir" 2>/dev/null
+			[ -d "$infodir" ] || line_result=1
+			if [ $line_result -eq 0 ]; then
+				${INSTALL_INFO} "$file" "$index" || line_result=1
+			fi
 			if [ $line_result -eq 0 ]; then
 				$echo "${TASK_MSG}> info file registered: $file"
 			else
