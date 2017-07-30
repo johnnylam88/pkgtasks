@@ -57,6 +57,7 @@ dist_pkgdata_DATA += echo.subr
 dist_pkgdata_DATA += files.subr
 dist_pkgdata_DATA += fonts.subr
 dist_pkgdata_DATA += groups.subr
+dist_pkgdata_DATA += icon_themes.subr
 dist_pkgdata_DATA += info_files.subr
 dist_pkgdata_DATA += load.subr
 dist_pkgdata_DATA += lock.subr
@@ -185,6 +186,14 @@ EXTRA_DIST += t/t_groups.sh
 t/t_groups: t/t_groups.sh t/build_test
 	-$(MKDIR_P) $(builddir)/t
 	$(AM_V_GEN)target="$(builddir)/t/t_groups" source="$(srcdir)/t/t_groups.sh"; \
+	$(BUILD_TEST)
+
+pkgtests_SCRIPTS += t/t_icon_themes
+CLEANFILES += t/t_icon_themes
+EXTRA_DIST += t/t_icon_themes.sh
+t/t_icon_themes: t/t_icon_themes.sh t/build_test
+	-$(MKDIR_P) $(builddir)/t
+	$(AM_V_GEN)target="$(builddir)/t/t_icon_themes" source="$(srcdir)/t/t_icon_themes.sh"; \
 	$(BUILD_TEST)
 
 pkgtests_SCRIPTS += t/t_info_files
