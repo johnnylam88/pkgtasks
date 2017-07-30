@@ -64,7 +64,7 @@ task_preremove()
 
 	[ -f "$datafile" ] || return 1
 
-	local stage="preinstall"
+	local stage="preremove"
 
 	# Unregistering a GNU info files requires reading the file to find
 	# all nodes listed in the file, so it must be done before the file
