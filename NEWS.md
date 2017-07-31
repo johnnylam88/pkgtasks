@@ -2,6 +2,18 @@ Package Tasks
 =============
 
 
+Changes in version 1.11
+-----------------------
+**Released on 2017-07-31.**
+
+* Invoke install-info(1) in a different way that matches how it
+  is typically invoked in GNU projects.
+
+* Add "icon_themes" task to update GTK+ icon theme caches.
+
+* Bug fixes.
+
+
 Changes in version 1.10
 -----------------------
 **Released on 2017-06-03.**
