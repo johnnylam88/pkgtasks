@@ -29,12 +29,12 @@
 #	icon_themes.subr -- icon theme cache management for packages
 #
 # SYNOPSIS
-#	task_icon_themes [-s] add | remove
+#	task_icon_themes [-s] add | remove <stage>
 #
 # DESCRIPTION
 #	The task_icon_themes function supports two actions, "add" and
-#	"remove", that will add or remove the icon cache from the
-#	system database.
+#	"remove", that will add or remove the GTK+ icon caches from the
+#	theme directories.
 #
 #	The available options are as follows:
 #
@@ -113,6 +113,8 @@ task_icon_themes()
 	[ $# -gt 0 ] || return 127
 
 	local action="$1"; shift
+	local stage="$1"
+
 	case $action in
 	add|remove)
 		: "valid action" ;;
@@ -126,19 +128,9 @@ task_icon_themes()
 	*)	prefix=${PKG_PREFIX} ;;
 	esac
 
-	# Set the command used to update the icon caches.
-	local update_cmd=
-	case $action in
-	add)	_task_icon_themes_cache_update_cmd
-		if [ "$__task_icon_themes_update_cmd__" != "missing" ]; then
-			update_cmd="$__task_icon_themes_update_cmd__"
-		fi
-		: ${update_cmd:=${GTK_UPDATE_ICON_CACHE:-true}} ;;
-	esac
-
 	local result=0
 	local hash tag themedir
-	local theme cache
+	local theme cache update_cmd
 	while read hash tag themedir; do
 		# Filter for "# ICON_THEME:"
 		case $hash/$tag in
@@ -157,10 +149,39 @@ task_icon_themes()
 		theme="$themedir/index.theme"
 		cache="$themedir/icon-theme.cache"
 
-		case $action in
-		add)	if [ ! -f "$theme" ]; then
-				$echo "${TASK_MSG}! icon theme missing: $themedir"
+		case "$action,$stage" in
+		remove,postremove)
+			: "avoid double removal of icon caches" ;;
+		remove,*)
+			if [ ! -f "$cache" ]; then
+				$echo "${TASK_MSG}> icon cache already removed: $themedir"
+			elif ${RM} -f "$cache"; then
+				$echo "${TASK_MSG}> icon cache removed: $themedir"
+			else
+				$echo "${TASK_MSG}! icon cache not removed: $themedir"
 				result=1
+			fi ;;
+		esac
+
+		# Update the icon caches during "add" action, but also during
+		# "remove" action at "postremove" stage if the theme directories
+		# still exist.
+		#
+		case "$action,$stage" in
+		add,*|remove,postremove)
+			# Set the command used to update the icon caches.
+			_task_icon_themes_cache_update_cmd
+			if [ "$__task_icon_themes_update_cmd__" != "missing" ]; then
+				update_cmd="$__task_icon_themes_update_cmd__"
+			fi
+			: ${update_cmd:=${GTK_UPDATE_ICON_CACHE:-true}}
+
+			if [ ! -f "$theme" ]; then
+				case $action in
+				add)	$echo "${TASK_MSG}! icon theme missing: $themedir"
+					result=1 ;;
+				remove)	: "silently skip updating" ;;
+				esac
 			elif [ -z "$update_cmd" ]; then
 				$echo "${TASK_MSG}! icon theme not cached - missing command: $themedir"
 				result=1
@@ -168,14 +189,6 @@ task_icon_themes()
 				$echo "${TASK_MSG}> icon theme cached: $themedir"
 			else
 				$echo "${TASK_MSG}! icon theme not cached: $themedir"
-				result=1
-			fi ;;
-		remove)	if [ ! -f "$cache" ]; then
-				$echo "${TASK_MSG}> icon cache already removed: $themedir"
-			elif ${RM} -f "$cache"; then
-				$echo "${TASK_MSG}> icon cache removed: $themedir"
-			else
-				$echo "${TASK_MSG}! icon cache not removed: $themedir"
 				result=1
 			fi ;;
 		esac

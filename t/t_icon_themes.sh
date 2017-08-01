@@ -156,6 +156,25 @@ test4()
 
 test5()
 {
+	describe="remove during postremove"
+	if task_icon_themes remove postremove < $datafile; then
+		: "success"
+	else
+		return 1
+	fi
+	# Assert the caches have been recreated.
+	for themedir in hicolor gnome; do
+		cache="${PKG_PREFIX}/share/icons/$themedir/icon-theme.cache"
+		if [ ! -f "$cache" ]; then
+			describe="$describe: $cache missing!"
+			return 1
+		fi
+	done
+	return 0
+}
+
+test6()
+{
 	describe="add with PKG_DESTDIR"
 	test_destdir_setup
 	if task_icon_themes add < $datafile; then
@@ -175,7 +194,7 @@ test5()
 	return 0
 }
 
-test6()
+test7()
 {
 	: ${RM:=rm}
 
@@ -191,7 +210,7 @@ test6()
 	return 0
 }
 
-test7()
+test8()
 {
 	describe="remove with PKG_DESTDIR"
 	test_destdir_setup
@@ -213,7 +232,7 @@ test7()
 	return 0
 }
 
-test8()
+test9()
 {
 	describe="remove with no caches with PKG_DESTDIR"
 	test_destdir_setup
@@ -228,6 +247,26 @@ test8()
 		cache="${PKG_DESTDIR}$cache"
 		if [ -f "$cache" ]; then
 			describe="$describe: $cache present!"
+			return 1
+		fi
+	done
+	return 0
+}
+
+test10()
+{
+	describe="remove during postremove with PKG_DESTDIR"
+	if task_icon_themes remove postremove < $datafile; then
+		: "success"
+	else
+		return 1
+	fi
+	# Assert the caches have been recreated.
+	for themedir in hicolor gnome; do
+		cache="${PKG_PREFIX}/share/icons/$themedir/icon-theme.cache"
+		cache="${PKG_DESTDIR}$cache"
+		if [ ! -f "$cache" ]; then
+			describe="$describe: $cache missing!"
 			return 1
 		fi
 	done
