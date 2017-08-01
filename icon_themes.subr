@@ -56,8 +56,10 @@
 #	The following variables are used if they are set:
 #
 #	GTK_UPDATE_ICON_CACHE
-#		The name or path to the GTK+ command to update the
-#		icon caches.
+#		The name or path to the GTK+ command to update the icon
+#		caches.  This is the fall-through default command if
+#		neither of the other two gtk-update-icon-cache(1)
+#		commands exist on the system.
 #
 #	GTK2_UPDATE_ICON_CACHE
 #		The name or path to the GTK+-2.x command to update the
@@ -92,7 +94,6 @@ task_load which
 
 task_icon_themes()
 {
-	: ${GTK_UPDATE_ICON_CACHE:=gtk-update-icon-cache}
 	: ${RM:=rm}
 
 	: ${PKG_PREFIX:=/usr/pkg}
@@ -132,7 +133,7 @@ task_icon_themes()
 		if [ "$__task_icon_themes_update_cmd__" != "missing" ]; then
 			update_cmd="$__task_icon_themes_update_cmd__"
 		fi
-		: ${update_cmd:=${GTK_UPDATE_ICON_CACHE}} ;;
+		: ${update_cmd:=${GTK_UPDATE_ICON_CACHE:-true}} ;;
 	esac
 
 	local result=0
@@ -184,7 +185,6 @@ task_icon_themes()
 
 _task_icon_themes_cache_update_cmd()
 {
-	: ${GTK_UPDATE_ICON_CACHE:=gtk-update-icon-cache}
 	: ${GTK2_UPDATE_ICON_CACHE:=gtk2-update-icon-cache}
 	: ${GTK3_UPDATE_ICON_CACHE:=gtk-update-icon-cache}
 
@@ -193,8 +193,7 @@ _task_icon_themes_cache_update_cmd()
 		local cmd
 		for cmd in \
 			"${GTK3_UPDATE_ICON_CACHE}" \
-			"${GTK2_UPDATE_ICON_CACHE}" \
-			"${GTK_UPDATE_ICON_CACHE}"
+			"${GTK2_UPDATE_ICON_CACHE}"
 		do
 			[ -n "$cmd" ] || continue
 			__task_icon_themes_update_cmd__=$( task_which "$cmd" )
