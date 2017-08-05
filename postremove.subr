@@ -100,7 +100,7 @@ task_postremove()
 	local post_checks="task_info_files task_files"
 
 	local result=0
-	local stage="preinstall"
+	local stage="postremove"
 
 	local post_fn silent action_result
 	for post_fn in $post_actions; do
