@@ -2,14 +2,28 @@ Package Tasks
 =============
 
 
+Changes in version 1.12
+-----------------------
+**Released on 2017-08-06.**
+
+* Use `${GTK_UPDATE_ICON_CACHE}` as the default command to update
+  the GTK+ icon theme caches in the `icon_themes` task,
+  defaulting to `true` if it is not set in the environment.  Also
+  force an update of the icon caches from the `postremove`
+  meta-task in case the icon theme is a composite of several
+  packages.  This makes the behavior more compatible with pkgsrc.
+
+* Bug fixes.
+
+
 Changes in version 1.11
 -----------------------
 **Released on 2017-07-31.**
 
-* Invoke install-info(1) in a different way that matches how it
-  is typically invoked in GNU projects.
+* Invoke install-info(1) in a different way that matches how it is
+  typically invoked in GNU projects.
 
-* Add "icon_themes" task to update GTK+ icon theme caches.
+* Add `icon_themes` task to update GTK+ icon theme caches.
 
 * Bug fixes.
 
