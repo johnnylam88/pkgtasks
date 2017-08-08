@@ -11,7 +11,7 @@ Changes in version 1.12
   defaulting to `true` if it is not set in the environment.  Also
   force an update of the icon caches from the `postremove`
   meta-task in case the icon theme is a composite of several
-  packages.  This makes the behavior more compatible with pkgsrc.
+  packages.  This makes the behavior more compatible with **pkgsrc**.
 
 * Bug fixes.
 
@@ -20,7 +20,7 @@ Changes in version 1.11
 -----------------------
 **Released on 2017-07-31.**
 
-* Invoke install-info(1) in a different way that matches how it is
+* Invoke `install-info` in a different way that matches how it is
   typically invoked in GNU projects.
 
 * Add `icon_themes` task to update GTK+ icon theme caches.
@@ -32,9 +32,9 @@ Changes in version 1.10
 -----------------------
 **Released on 2017-06-03.**
 
-* Modify Makefile.am to always use the same pathname to refer to a
+* Modify `Makefile.am` to always use the same pathname to refer to a
   built object.  This fixes the dependency graph in the case where
-  make(1) is invoked to run with multiple jobs.
+  `make` is invoked to run with multiple jobs.
 
 * Change the output of the `directories` and `files` tasks to be
   less verbose in the most common case where a directory is
@@ -50,10 +50,10 @@ Changes in version 1.9
   permissions when new objects are created, and to not throw
   errors if the object is missing because it wasn't created in
   an earlier step.  This makes the behavior more compatible with
-  pkgsrc.
+  **pkgsrc**.
 
 * Depending on the values of certain environment variables, certain
-  "add" or "remove" actions may not actually perform operations that
+  *add* or *remove* actions may not actually perform operations that
   change the system and still return successfully.  Always run the
   "check" actions for the corresponding main action so that any
   warning messages intended for the user are written to standard
