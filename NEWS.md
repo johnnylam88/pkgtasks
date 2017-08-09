@@ -2,6 +2,15 @@ Package Tasks
 =============
 
 
+Changes in version 1.13
+-----------------------
+**Released on 2017-08-08.**
+
+* Make the output messages for the `groups` and `users` tasks easier
+  to understand by making them slightly more verobse and changing
+  the formatting.
+
+
 Changes in version 1.12
 -----------------------
 **Released on 2017-08-06.**
