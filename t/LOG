@@ -1,0 +1,1324 @@
+*** t_compare.sh ***
+1..6
+ok 1 - identical files
+ok 2 - truncated first file
+ok 3 - truncated second file
+ok 4 - leading whitespace differences
+ok 5 - trailing whitespace differences
+ok 6 - different content
+# passed all 6 test(s)
+*** t_createfile.sh ***
+1..4
+ok 1 - make one file
+ok 2 - make two files
+ok 3 - make file with mode
+ok 4 - overwrite existing file
+# passed all 4 test(s)
+*** t_directories.sh ***
+1..15
+> directory created: /tmp/pkgtasks.test1.Kcsv2CmT/etc/pkg1
+ok 1 - make dir
+ok 2 - skip make dir
+> directory created: /tmp/pkgtasks.test3.GO9MVkfm/etc/pkg1
+ok 3 - remove make dir
+ok 4 - remove skipped make dir
+ok 5 - remove skipped made dir
+> directory created: /tmp/pkgtasks.test6.ZAnAoygu/etc/common
+ok 6 - make dir for 2 packages
+> directory created: /tmp/pkgtasks.test7.qjD1jhLC/etc/common
+ok 7 - remove after make dir for 2 packages
+> owned directory created: /tmp/pkgtasks.test8.WlkjFRbF/etc/pkg1
+> owned directory removed: /tmp/pkgtasks.test8.WlkjFRbF/etc/pkg1
+ok 8 - remove owned directory
+> owned directory created: /tmp/pkgtasks.test9.KwOyhKrS/etc/common
+! directory owner conflict: /tmp/pkgtasks.test9.KwOyhKrS/etc/common
+ok 9 - conflicting owner
+> owned directory created: /tmp/pkgtasks.test10.SuYIoZoJ/etc/common
+! directory owned but references exist: /tmp/pkgtasks.test10.SuYIoZoJ/etc/common
+ok 10 - remove owned directory used by another package
+ok 11 # skip owned dir with permissions (requires root)
+> directory created: /tmp/pkgtasks.test12.fOSljHLS/destdir/tmp/pkgtasks.test12.fOSljHLS/etc/pkg1
+ok 12 - make dir with PKG_DESTDIR
+ok 13 - skip make dir with PKG_DESTDIR
+> directory created: /tmp/pkgtasks.test14.uuCeKb0f/destdir/tmp/pkgtasks.test14.uuCeKb0f/etc/pkg1
+ok 14 - remove make dir with PKG_DESTDIR
+ok 15 - remove skipped made dir with PKG_DESTDIR
+# skipped 1 test(s)
+# passed all 15 test(s)
+*** t_dirwalk.sh ***
+1..3
+ok 1 - dirwalk root
+ok 2 - dirwalk -d root
+ok 3 - dirwalk -f root
+# passed all 3 test(s)
+*** t_echo.sh ***
+1..12
+ok 1 - task_echo -b buffers text
+ok 2 - task_echo -c clears buffer
+ok 3 - task_echo -bc clears buffer
+ok 4 - task_echo -n skips trailing newline
+ok 5 - task_echo preserves leading whitespace
+ok 6 - task_echo preserves leading whitespace after buffer output
+ok 7 - task_echo -b buffers text with log
+ok 8 - task_echo -c clears buffer with log
+ok 9 - task_echo -bc clears buffer with log
+ok 10 - task_echo -n skips trailing newline with log
+ok 11 - task_echo preserves leading whitespace with log
+ok 12 - task_echo preserves leading whitespace after buffer output with log
+# passed all 12 test(s)
+*** t_files.sh ***
+1..22
+! file not copied: /tmp/pkgtasks.test1.Ij77YYUW/etc/conffile1
+!!! INFO: run_tests.sh: Create file: /tmp/pkgtasks.test1.Ij77YYUW/etc/conffile1
+ok 1 - missing example file
+cp: /tmp/pkgtasks.test2.DxzOBHsp/nonexistent/conffile2: No such file or directory
+! file not copied: /tmp/pkgtasks.test2.DxzOBHsp/nonexistent/conffile2
+!!! INFO: run_tests.sh: Create file: /tmp/pkgtasks.test2.DxzOBHsp/nonexistent/conffile2 [/tmp/pkgtasks.test2.DxzOBHsp/share/examples/pkg2/conffile2]
+ok 2 - missing target directory
+> file copied: /tmp/pkgtasks.test3.p2tV4b16/etc/conffile2
+ok 3 - copy
+ok 4 - skip copy
+! file copy skipped: /tmp/pkgtasks.test5.D33QY0Ee/etc/rc.d/conffile2
+!!! INFO: run_tests.sh: Create file: /tmp/pkgtasks.test5.D33QY0Ee/etc/rc.d/conffile2 [/tmp/pkgtasks.test5.D33QY0Ee/share/examples/pkg2/conffile2]
+ok 5 - copy rc.d script
+> file copied: /tmp/pkgtasks.test6.1BxE9gPL/etc/conffile2
+> file removed: /tmp/pkgtasks.test6.1BxE9gPL/etc/conffile2
+ok 6 - remove after copy
+> file removed: /tmp/pkgtasks.test7.9Lvgiftp/etc/conffile2
+ok 7 - remove after skipped but copied
+> file copied: /tmp/pkgtasks.test8.tNanXVP4/etc/conffile2
+! file differs from default: /tmp/pkgtasks.test8.tNanXVP4/etc/conffile2
+! file not removed: /tmp/pkgtasks.test8.tNanXVP4/etc/conffile2
+!!! INFO: run_tests.sh: Remove file: /tmp/pkgtasks.test8.tNanXVP4/etc/conffile2
+ok 8 - remove after modification
+! file differs from default: /tmp/pkgtasks.test9.yO6SrKcM/etc/conffile2
+! file not removed: /tmp/pkgtasks.test9.yO6SrKcM/etc/conffile2
+!!! INFO: run_tests.sh: Remove file: /tmp/pkgtasks.test9.yO6SrKcM/etc/conffile2
+ok 9 - remove after skipped but copied and modification
+! file already exists: /tmp/pkgtasks.test10.81CG1Qee/etc/conffile2
+ok 10 - copy with preexisting
+! file already exists: /tmp/pkgtasks.test11.AgyiHPRh/etc/conffile2
+! file differs from default: /tmp/pkgtasks.test11.AgyiHPRh/etc/conffile2
+! file not removed: /tmp/pkgtasks.test11.AgyiHPRh/etc/conffile2
+!!! INFO: run_tests.sh: Remove file: /tmp/pkgtasks.test11.AgyiHPRh/etc/conffile2
+ok 11 - remove after copy with preexisting
+ok 12 # skip copy with permissions (requires root)
+! file not copied: /tmp/pkgtasks.test13.k1A0m1ms/destdir/tmp/pkgtasks.test13.k1A0m1ms/etc/conffile1
+!!! INFO: run_tests.sh: Create file: /tmp/pkgtasks.test13.k1A0m1ms/destdir/tmp/pkgtasks.test13.k1A0m1ms/etc/conffile1
+ok 13 - missing example file with PKG_DESTDIR
+cp: /tmp/pkgtasks.test14.mbSwRVaH/destdir/tmp/pkgtasks.test14.mbSwRVaH/nonexistent/conffile2: No such file or directory
+! file not copied: /tmp/pkgtasks.test14.mbSwRVaH/destdir/tmp/pkgtasks.test14.mbSwRVaH/nonexistent/conffile2
+!!! INFO: run_tests.sh: Create file: /tmp/pkgtasks.test14.mbSwRVaH/destdir/tmp/pkgtasks.test14.mbSwRVaH/nonexistent/conffile2 [/tmp/pkgtasks.test14.mbSwRVaH/destdir/tmp/pkgtasks.test14.mbSwRVaH/share/examples/pkg2/conffile2]
+ok 14 - missing target directory with PKG_DESTDIR
+> file copied: /tmp/pkgtasks.test15.L7RKtAds/destdir/tmp/pkgtasks.test15.L7RKtAds/etc/conffile2
+ok 15 - copy with PKG_DESTDIR
+ok 16 - skip copy with PKG_DESTDIR
+! file copy skipped: /tmp/pkgtasks.test17.0wnGkvqa/destdir/tmp/pkgtasks.test17.0wnGkvqa/etc/rc.d/conffile2
+!!! INFO: run_tests.sh: Create file: /tmp/pkgtasks.test17.0wnGkvqa/destdir/tmp/pkgtasks.test17.0wnGkvqa/etc/rc.d/conffile2 [/tmp/pkgtasks.test17.0wnGkvqa/destdir/tmp/pkgtasks.test17.0wnGkvqa/share/examples/pkg2/conffile2]
+ok 17 - copy rc.d script with PKG_DESTDIR
+> file copied: /tmp/pkgtasks.test18.7iSi2nWZ/destdir/tmp/pkgtasks.test18.7iSi2nWZ/etc/conffile2
+> file removed: /tmp/pkgtasks.test18.7iSi2nWZ/destdir/tmp/pkgtasks.test18.7iSi2nWZ/etc/conffile2
+ok 18 - remove after copy with PKG_DESTDIR
+> file removed: /tmp/pkgtasks.test19.gWCnoqRG/destdir/tmp/pkgtasks.test19.gWCnoqRG/etc/conffile2
+ok 19 - remove after skipped but copied with PKG_DESTDIR
+> file copied: /tmp/pkgtasks.test20.fQKCm093/destdir/tmp/pkgtasks.test20.fQKCm093/etc/conffile2
+! file differs from default: /tmp/pkgtasks.test20.fQKCm093/destdir/tmp/pkgtasks.test20.fQKCm093/etc/conffile2
+! file not removed: /tmp/pkgtasks.test20.fQKCm093/destdir/tmp/pkgtasks.test20.fQKCm093/etc/conffile2
+!!! INFO: run_tests.sh: Remove file: /tmp/pkgtasks.test20.fQKCm093/destdir/tmp/pkgtasks.test20.fQKCm093/etc/conffile2
+ok 20 - remove after modification with PKG_DESTDIR
+! file differs from default: /tmp/pkgtasks.test21.HRVS3vsB/destdir/tmp/pkgtasks.test21.HRVS3vsB/etc/conffile2
+! file not removed: /tmp/pkgtasks.test21.HRVS3vsB/destdir/tmp/pkgtasks.test21.HRVS3vsB/etc/conffile2
+!!! INFO: run_tests.sh: Remove file: /tmp/pkgtasks.test21.HRVS3vsB/destdir/tmp/pkgtasks.test21.HRVS3vsB/etc/conffile2
+ok 21 - remove after skipped but copied and modification with PKG_DESTDIR
+! file already exists: /tmp/pkgtasks.test22.oPxufXlk/destdir/tmp/pkgtasks.test22.oPxufXlk/etc/conffile2
+ok 22 - copy with preexisting with PKG_DESTDIR
+# skipped 1 test(s)
+# passed all 22 test(s)
+*** t_fonts.sh ***
+1..12
+> fonts index rebuilt: /tmp/pkgtasks.test1.sg5doD5z/share/fonts/ttf
+> empty fonts directory removed: /tmp/pkgtasks.test1.sg5doD5z/share/fonts/ttf
+ok 1 - empty ttf fonts dir
+> fonts index rebuilt: /tmp/pkgtasks.test2.8cQ53WOZ/share/fonts/ttf
+ok 2 - non-empty ttf fonts dir
+> fonts index rebuilt: /tmp/pkgtasks.test3.RDGPsorq/share/fonts/type1
+> empty fonts directory removed: /tmp/pkgtasks.test3.RDGPsorq/share/fonts/type1
+ok 3 - empty type1 fonts dir
+> fonts index rebuilt: /tmp/pkgtasks.test4.rQlxFTUq/share/fonts/type1
+ok 4 - non-empty type1 fonts dir
+> fonts index rebuilt: /tmp/pkgtasks.test5.RS9sh6gA/share/fonts/x11
+> empty fonts directory removed: /tmp/pkgtasks.test5.RS9sh6gA/share/fonts/x11
+ok 5 - empty x11 fonts dir
+> fonts index rebuilt: /tmp/pkgtasks.test6.cDQB8JO5/share/fonts/x11
+ok 6 - non-empty x11 fonts dir
+> fonts index rebuilt: /tmp/pkgtasks.test7.l3cafjGD/destdir/tmp/pkgtasks.test7.l3cafjGD/share/fonts/ttf
+> empty fonts directory removed: /tmp/pkgtasks.test7.l3cafjGD/destdir/tmp/pkgtasks.test7.l3cafjGD/share/fonts/ttf
+ok 7 - empty ttf fonts dir with PKG_DESTDIR
+> fonts index rebuilt: /tmp/pkgtasks.test8.WAnmcMul/destdir/tmp/pkgtasks.test8.WAnmcMul/share/fonts/ttf
+ok 8 - non-empty ttf fonts dir with PKG_DESTDIR
+> fonts index rebuilt: /tmp/pkgtasks.test9.ZInznczI/destdir/tmp/pkgtasks.test9.ZInznczI/share/fonts/type1
+> empty fonts directory removed: /tmp/pkgtasks.test9.ZInznczI/destdir/tmp/pkgtasks.test9.ZInznczI/share/fonts/type1
+ok 9 - empty type1 fonts dir with PKG_DESTDIR
+> fonts index rebuilt: /tmp/pkgtasks.test10.dXu2I3V2/destdir/tmp/pkgtasks.test10.dXu2I3V2/share/fonts/type1
+ok 10 - non-empty type1 fonts dir with PKG_DESTDIR
+> fonts index rebuilt: /tmp/pkgtasks.test11.a4l2vo6o/destdir/tmp/pkgtasks.test11.a4l2vo6o/share/fonts/x11
+> empty fonts directory removed: /tmp/pkgtasks.test11.a4l2vo6o/destdir/tmp/pkgtasks.test11.a4l2vo6o/share/fonts/x11
+ok 11 - empty x11 fonts dir with PKG_DESTDIR
+> fonts index rebuilt: /tmp/pkgtasks.test12.Lz2sm7xZ/destdir/tmp/pkgtasks.test12.Lz2sm7xZ/share/fonts/x11
+ok 12 - non-empty x11 fonts dir with PKG_DESTDIR
+# passed all 12 test(s)
+*** t_groups.sh ***
+1..9
+!!! INFO: run_tests.sh: Create group: groupG
+!!! INFO: run_tests.sh: Create group: groupH (gid = 300)
+!!! INFO: run_tests.sh: Create group: groupI (gid = 305)
+ok 1 - check-add missing groups
+> group created: groupG
+> group created: groupH (gid = 300)
+> group created: groupI (gid = 305)
+ok 2 - add nonexistent groups
+> group created: groupG
+! group already exists: groupH
+> group created: groupI (gid = 305)
+ok 3 - add existent and nonexistent groups
+> group created: groupG
+! group conflict: groupH (gid = 300)
+ok 4 - add conflicting group
+> group created: groupG
+> group created: groupH (gid = 300)
+> group created: groupI (gid = 305)
+ok 5 - check-add groups with all groups added
+> group created: groupG
+> group created: groupH (gid = 300)
+> group created: groupI (gid = 305)
+!!! INFO: run_tests.sh: Remove group if unused: groupG
+!!! INFO: run_tests.sh: Remove group if unused: groupH
+!!! INFO: run_tests.sh: Remove group if unused: groupI
+ok 6 - check-remove groups with no groups removed
+> group created: groupG
+> group created: groupH (gid = 300)
+> group created: groupI (gid = 305)
+ok 7 - remove existent groups
+ok 8 - remove nonexistent groups
+ok 9 - check-remove groups with groups already removed
+# passed all 9 test(s)
+*** t_icon_themes.sh ***
+1..10
+> icon theme cached: /tmp/pkgtasks.test1.jNIxTxQs/share/icons/hicolor
+> icon theme cached: /tmp/pkgtasks.test1.jNIxTxQs/share/icons/gnome
+ok 1 - add
+! icon theme missing: /tmp/pkgtasks.test2.bPZ84pev/share/icons/hicolor
+> icon theme cached: /tmp/pkgtasks.test2.bPZ84pev/share/icons/gnome
+ok 2 - add with missing index.theme
+> icon theme cached: /tmp/pkgtasks.test3.QBNf577w/share/icons/hicolor
+> icon theme cached: /tmp/pkgtasks.test3.QBNf577w/share/icons/gnome
+> icon cache removed: /tmp/pkgtasks.test3.QBNf577w/share/icons/hicolor
+> icon cache removed: /tmp/pkgtasks.test3.QBNf577w/share/icons/gnome
+ok 3 - remove
+> icon cache already removed: /tmp/pkgtasks.test4.cezT4xfG/share/icons/hicolor
+> icon cache already removed: /tmp/pkgtasks.test4.cezT4xfG/share/icons/gnome
+ok 4 - remove with no caches
+> icon theme cached: /tmp/pkgtasks.test5.q0V6X9MU/share/icons/hicolor
+> icon theme cached: /tmp/pkgtasks.test5.q0V6X9MU/share/icons/gnome
+ok 5 - remove during postremove
+> icon theme cached: /tmp/pkgtasks.test6.LcvOzbMX/destdir/tmp/pkgtasks.test6.LcvOzbMX/share/icons/hicolor
+> icon theme cached: /tmp/pkgtasks.test6.LcvOzbMX/destdir/tmp/pkgtasks.test6.LcvOzbMX/share/icons/gnome
+ok 6 - add with PKG_DESTDIR
+! icon theme missing: /tmp/pkgtasks.test7.sMAbHls5/destdir/tmp/pkgtasks.test7.sMAbHls5/share/icons/hicolor
+> icon theme cached: /tmp/pkgtasks.test7.sMAbHls5/destdir/tmp/pkgtasks.test7.sMAbHls5/share/icons/gnome
+ok 7 - add with missing index.theme with PKG_DESTDIR
+> icon theme cached: /tmp/pkgtasks.test8.zrsAzDHg/destdir/tmp/pkgtasks.test8.zrsAzDHg/share/icons/hicolor
+> icon theme cached: /tmp/pkgtasks.test8.zrsAzDHg/destdir/tmp/pkgtasks.test8.zrsAzDHg/share/icons/gnome
+> icon cache removed: /tmp/pkgtasks.test8.zrsAzDHg/destdir/tmp/pkgtasks.test8.zrsAzDHg/share/icons/hicolor
+> icon cache removed: /tmp/pkgtasks.test8.zrsAzDHg/destdir/tmp/pkgtasks.test8.zrsAzDHg/share/icons/gnome
+ok 8 - remove with PKG_DESTDIR
+> icon cache already removed: /tmp/pkgtasks.test9.7w3pFt6J/destdir/tmp/pkgtasks.test9.7w3pFt6J/share/icons/hicolor
+> icon cache already removed: /tmp/pkgtasks.test9.7w3pFt6J/destdir/tmp/pkgtasks.test9.7w3pFt6J/share/icons/gnome
+ok 9 - remove with no caches with PKG_DESTDIR
+> icon theme cached: /tmp/pkgtasks.test10.HkyWVugP/share/icons/hicolor
+> icon theme cached: /tmp/pkgtasks.test10.HkyWVugP/share/icons/gnome
+ok 10 - remove during postremove with PKG_DESTDIR
+# passed all 10 test(s)
+*** t_info_files.sh ***
+1..20
+> info file already unregistered: /tmp/pkgtasks.test1.91a3euPt/info/test.info
+ok 1 - missing dir file on remove
+> info file registered: /tmp/pkgtasks.test2.EhmJ3t5R/info/test.info
+ok 2 - missing dir file on add
+install-info: /tmp/pkgtasks.test3.Ytt5FdoJ/info/dir: empty file
+! info file not unregistered: /tmp/pkgtasks.test3.Ytt5FdoJ/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test3.Ytt5FdoJ/info/dir
+ok 3 - empty dir file on remove
+install-info: /tmp/pkgtasks.test4.uxZBoq0A/info/dir: empty file
+! info file not registered: /tmp/pkgtasks.test4.uxZBoq0A/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test4.uxZBoq0A/info/dir
+ok 4 - empty dir file on add
+install-info: warning: no entries found for `/tmp/pkgtasks.test5.v1y0Dztt/info/test.info'; nothing deleted
+> info file unregistered: /tmp/pkgtasks.test5.v1y0Dztt/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test5.v1y0Dztt/info/dir
+ok 5 - invalid dir file on remove
+> info file registered: /tmp/pkgtasks.test6.DjIVCjsp/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test6.DjIVCjsp/info/dir
+ok 6 - invalid dir file on add
+! info file missing: /nonexistent.info
+ok 7 - remove nonexistent info file from missing dir file
+> info file registered: /tmp/pkgtasks.test8.soedk3f8/info/test.info
+ok 8 - add info file to missing dir file
+> info file registered: /tmp/pkgtasks.test9.jPRRU2oO/info/test.info
+> info file unregistered: /tmp/pkgtasks.test9.jPRRU2oO/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test9.jPRRU2oO/info/dir
+ok 9 - remove info file after successful add
+> info file registered: /tmp/pkgtasks.test10.prpzDCrC/info/test.info
+> info file registered: /tmp/pkgtasks.test10.prpzDCrC/info/test.info
+> info file registered: /tmp/pkgtasks.test10.prpzDCrC/info/test.info
+> info file registered: /tmp/pkgtasks.test10.prpzDCrC/info/test.info
+ok 10 - add info file more than once
+> info file already unregistered: /tmp/pkgtasks.test11.2cwKo2Nl/destdir/tmp/pkgtasks.test11.2cwKo2Nl/info/test.info
+ok 11 - missing dir file on remove with PKG_DESTDIR
+> info file registered: /tmp/pkgtasks.test12.PPgKjgZJ/destdir/tmp/pkgtasks.test12.PPgKjgZJ/info/test.info
+ok 12 - missing dir file on add with PKG_DESTDIR
+install-info: /tmp/pkgtasks.test13.Bu7h8LVV/destdir/tmp/pkgtasks.test13.Bu7h8LVV/info/dir: empty file
+! info file not unregistered: /tmp/pkgtasks.test13.Bu7h8LVV/destdir/tmp/pkgtasks.test13.Bu7h8LVV/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test13.Bu7h8LVV/destdir/tmp/pkgtasks.test13.Bu7h8LVV/info/dir
+ok 13 - empty dir file on remove with PKG_DESTDIR
+install-info: /tmp/pkgtasks.test14.uZsHqFNz/destdir/tmp/pkgtasks.test14.uZsHqFNz/info/dir: empty file
+! info file not registered: /tmp/pkgtasks.test14.uZsHqFNz/destdir/tmp/pkgtasks.test14.uZsHqFNz/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test14.uZsHqFNz/destdir/tmp/pkgtasks.test14.uZsHqFNz/info/dir
+ok 14 - empty dir file on add with PKG_DESTDIR
+install-info: warning: no entries found for `/tmp/pkgtasks.test15.fwjtYtTL/destdir/tmp/pkgtasks.test15.fwjtYtTL/info/test.info'; nothing deleted
+> info file unregistered: /tmp/pkgtasks.test15.fwjtYtTL/destdir/tmp/pkgtasks.test15.fwjtYtTL/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test15.fwjtYtTL/destdir/tmp/pkgtasks.test15.fwjtYtTL/info/dir
+ok 15 - invalid dir file on remove with PKG_DESTDIR
+> info file registered: /tmp/pkgtasks.test16.zZHpAoFM/destdir/tmp/pkgtasks.test16.zZHpAoFM/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test16.zZHpAoFM/destdir/tmp/pkgtasks.test16.zZHpAoFM/info/dir
+ok 16 - invalid dir file on add with PKG_DESTDIR
+! info file missing: /tmp/pkgtasks.test17.mS0Njzte/destdir/nonexistent.info
+ok 17 - remove nonexistent info file from missing dir file with PKG_DESTDIR
+> info file registered: /tmp/pkgtasks.test18.lYVT7pZY/destdir/tmp/pkgtasks.test18.lYVT7pZY/info/test.info
+ok 18 - add info file to missing dir file with PKG_DESTDIR
+> info file registered: /tmp/pkgtasks.test19.Bf4R7MGC/destdir/tmp/pkgtasks.test19.Bf4R7MGC/info/test.info
+> info file unregistered: /tmp/pkgtasks.test19.Bf4R7MGC/destdir/tmp/pkgtasks.test19.Bf4R7MGC/info/test.info
+> empty dir file removed: /tmp/pkgtasks.test19.Bf4R7MGC/destdir/tmp/pkgtasks.test19.Bf4R7MGC/info/dir
+ok 19 - remove info file after successful add with PKG_DESTDIR
+> info file registered: /tmp/pkgtasks.test20.nLWiqDpC/destdir/tmp/pkgtasks.test20.nLWiqDpC/info/test.info
+> info file registered: /tmp/pkgtasks.test20.nLWiqDpC/destdir/tmp/pkgtasks.test20.nLWiqDpC/info/test.info
+> info file registered: /tmp/pkgtasks.test20.nLWiqDpC/destdir/tmp/pkgtasks.test20.nLWiqDpC/info/test.info
+> info file registered: /tmp/pkgtasks.test20.nLWiqDpC/destdir/tmp/pkgtasks.test20.nLWiqDpC/info/test.info
+ok 20 - add info file more than once with PKG_DESTDIR
+# passed all 20 test(s)
+*** t_lock.sh ***
+1..4
+ok 1 - create lock
+ok 2 - create nonblocking lock, pre-existing lock file
+ok 3 - release lock
+ok 4 - create lock, competing processes
+# passed all 4 test(s)
+*** t_makedir.sh ***
+1..3
+ok 1 - makedir a/b/c
+mkdir "a"
+mkdir "a/b"
+mkdir "a/b/c"
+ok 2 - makedir -i a/b/c
+mkdir "a"
+mkdir "a/b"
+mkdir "a/b/c"
+chmod "700" "a/b/c"
+ok 3 - makedir -i -m 700 a/b/c
+# passed all 3 test(s)
+*** t_maketemp.sh ***
+1..8
+ok 1 - maketemp
+ok 2 - maketemp -p /tmp/pkgtasks.test2.n1bUnru5/etc
+ok 3 - maketemp -t foobar
+ok 4 - maketemp /tmp/pkgtasks.test4.CH7zQM69/etc/group.XXX
+ok 5 - maketemp -d
+ok 6 - maketemp -d -p /tmp/pkgtasks.test6.sRqhb0L6/etc
+ok 7 - maketemp -d -t foobar
+ok 8 - maketemp -d /tmp/pkgtasks.test8.kPM7odhH/etc/group.XXX
+# passed all 8 test(s)
+*** t_match.sh ***
+1..11
+ok 1 - exact plain match one line
+ok 2 - word plain match one line
+ok 3 - word plain match multiple lines
+ok 4 - word reverse match one line
+ok 5 - word reverse match multiple lines
+ok 6 - exact plain match no lines
+ok 7 - word plain match silent
+ok 8 - word reverse match silent
+ok 9 - exact plain match no lines silent
+ok 10 - exact reverse match no lines silent
+ok 11 - plain glob match one line
+# passed all 11 test(s)
+*** t_ocaml_findlib.sh ***
+1..15
+!!! INFO: run_tests.sh: Add path "/tmp/pkgtasks.test1.nI948mAm/lib/ocaml/site-lib/pcre" to /tmp/pkgtasks.test1.nI948mAm/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Add path "/tmp/pkgtasks.test1.nI948mAm/lib/ocaml/site-lib/base64" to /tmp/pkgtasks.test1.nI948mAm/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Add path "/tmp/pkgtasks.test1.nI948mAm/lib/ocaml/site-lib/expat" to /tmp/pkgtasks.test1.nI948mAm/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Add path "/tmp/pkgtasks.test1.nI948mAm/lib/ocaml/site-lib/pcre" to /tmp/pkgtasks.test1.nI948mAm/lib/ocaml/ld.conf.
+ok 1 - check-add findlib dirs with empty ld.conf
+> path added: /tmp/pkgtasks.test2.7W9IcpTs/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test2.7W9IcpTs/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test2.7W9IcpTs/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test2.7W9IcpTs/lib/ocaml/site-lib/pcre
+ok 2 - add findlib dirs
+> path added: /tmp/pkgtasks.test3.1db7dyGi/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test3.1db7dyGi/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test3.1db7dyGi/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test3.1db7dyGi/lib/ocaml/site-lib/pcre
+ok 3 - verify uniqueness
+> path added: /tmp/pkgtasks.test4.iLXObQOO/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test4.iLXObQOO/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test4.iLXObQOO/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test4.iLXObQOO/lib/ocaml/site-lib/pcre
+ok 4 - check-add findlib dirs with all dirs added
+> path added: /tmp/pkgtasks.test5.N83m46GS/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test5.N83m46GS/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test5.N83m46GS/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test5.N83m46GS/lib/ocaml/site-lib/pcre
+!!! INFO: run_tests.sh: Remove path "/tmp/pkgtasks.test5.N83m46GS/lib/ocaml/site-lib/pcre" from /tmp/pkgtasks.test5.N83m46GS/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Remove path "/tmp/pkgtasks.test5.N83m46GS/lib/ocaml/site-lib/base64" from /tmp/pkgtasks.test5.N83m46GS/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Remove path "/tmp/pkgtasks.test5.N83m46GS/lib/ocaml/site-lib/expat" from /tmp/pkgtasks.test5.N83m46GS/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Remove path "/tmp/pkgtasks.test5.N83m46GS/lib/ocaml/site-lib/pcre" from /tmp/pkgtasks.test5.N83m46GS/lib/ocaml/ld.conf.
+ok 5 - check-remove findlib dirs with no dirs removed
+> path added: /tmp/pkgtasks.test6.vpftZxvl/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test6.vpftZxvl/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test6.vpftZxvl/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test6.vpftZxvl/lib/ocaml/site-lib/pcre
+> path removed: /tmp/pkgtasks.test6.vpftZxvl/lib/ocaml/site-lib/pcre
+> path removed: /tmp/pkgtasks.test6.vpftZxvl/lib/ocaml/site-lib/base64
+> path removed: /tmp/pkgtasks.test6.vpftZxvl/lib/ocaml/site-lib/expat
+> path already removed: /tmp/pkgtasks.test6.vpftZxvl/lib/ocaml/site-lib/pcre
+ok 6 - remove findlib dirs
+> path added: /tmp/pkgtasks.test7.7lDG1Z9m/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test7.7lDG1Z9m/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test7.7lDG1Z9m/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test7.7lDG1Z9m/lib/ocaml/site-lib/pcre
+> path removed: /tmp/pkgtasks.test7.7lDG1Z9m/lib/ocaml/site-lib/pcre
+> path removed: /tmp/pkgtasks.test7.7lDG1Z9m/lib/ocaml/site-lib/base64
+> path removed: /tmp/pkgtasks.test7.7lDG1Z9m/lib/ocaml/site-lib/expat
+> path already removed: /tmp/pkgtasks.test7.7lDG1Z9m/lib/ocaml/site-lib/pcre
+ok 7 - verify empty ld.conf
+ok 8 - check-remove findlib dirs with empty ld.conf
+> path added: /tmp/pkgtasks.test9.Rn7YrBdb/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test9.Rn7YrBdb/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test9.Rn7YrBdb/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test9.Rn7YrBdb/lib/ocaml/site-lib/pcre
+ok 9 - add findlib dirs with PKG_DESTDIR
+> path added: /tmp/pkgtasks.test10.n1Q1ApP7/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test10.n1Q1ApP7/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test10.n1Q1ApP7/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test10.n1Q1ApP7/lib/ocaml/site-lib/pcre
+ok 10 - verify uniqueness with PKG_DESTDIR
+> path added: /tmp/pkgtasks.test11.bh0YBwc0/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test11.bh0YBwc0/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test11.bh0YBwc0/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test11.bh0YBwc0/lib/ocaml/site-lib/pcre
+ok 11 - check-add findlib dirs with all dirs added with PKG_DESTDIR
+> path added: /tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/site-lib/pcre
+!!! INFO: run_tests.sh: Remove path "/tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/site-lib/pcre" from /tmp/pkgtasks.test12.xMFjMSXH/destdir/tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Remove path "/tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/site-lib/base64" from /tmp/pkgtasks.test12.xMFjMSXH/destdir/tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Remove path "/tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/site-lib/expat" from /tmp/pkgtasks.test12.xMFjMSXH/destdir/tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/ld.conf.
+!!! INFO: run_tests.sh: Remove path "/tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/site-lib/pcre" from /tmp/pkgtasks.test12.xMFjMSXH/destdir/tmp/pkgtasks.test12.xMFjMSXH/lib/ocaml/ld.conf.
+ok 12 - check-remove findlib dirs with no dirs removed with PKG_DESTDIR
+> path added: /tmp/pkgtasks.test13.D0fB3iCa/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test13.D0fB3iCa/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test13.D0fB3iCa/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test13.D0fB3iCa/lib/ocaml/site-lib/pcre
+> path removed: /tmp/pkgtasks.test13.D0fB3iCa/lib/ocaml/site-lib/pcre
+> path removed: /tmp/pkgtasks.test13.D0fB3iCa/lib/ocaml/site-lib/base64
+> path removed: /tmp/pkgtasks.test13.D0fB3iCa/lib/ocaml/site-lib/expat
+> path already removed: /tmp/pkgtasks.test13.D0fB3iCa/lib/ocaml/site-lib/pcre
+ok 13 - remove findlib dirs with PKG_DESTDIR
+> path added: /tmp/pkgtasks.test14.4F1OKoBo/lib/ocaml/site-lib/pcre
+> path added: /tmp/pkgtasks.test14.4F1OKoBo/lib/ocaml/site-lib/base64
+> path added: /tmp/pkgtasks.test14.4F1OKoBo/lib/ocaml/site-lib/expat
+! path already added: /tmp/pkgtasks.test14.4F1OKoBo/lib/ocaml/site-lib/pcre
+> path removed: /tmp/pkgtasks.test14.4F1OKoBo/lib/ocaml/site-lib/pcre
+> path removed: /tmp/pkgtasks.test14.4F1OKoBo/lib/ocaml/site-lib/base64
+> path removed: /tmp/pkgtasks.test14.4F1OKoBo/lib/ocaml/site-lib/expat
+> path already removed: /tmp/pkgtasks.test14.4F1OKoBo/lib/ocaml/site-lib/pcre
+ok 14 - verify empty ld.conf with PKG_DESTDIR
+ok 15 - check-remove findlib dirs with empty ld.conf with PKG_DESTDIR
+# passed all 15 test(s)
+*** t_permissions.sh ***
+1..6
+!!! INFO: run_tests.sh: Set permissions: /tmp/pkgtasks.test1.hE9MeI0H/file1 (m=0444)
+! permissions not set on missing: /tmp/pkgtasks.test1.hE9MeI0H/file1
+ok 1 - missing file
+> permissions set: /tmp/pkgtasks.test2.kB8QKbk9/file1 (m=0444)
+ok 2 - change only file mode
+ok 3 # skip change to root/wheel (requires root)
+!!! INFO: run_tests.sh: Set permissions: /tmp/pkgtasks.test4.EfXlvjFe/destdir/tmp/pkgtasks.test4.EfXlvjFe/file1 (m=0444)
+! permissions not set on missing: /tmp/pkgtasks.test4.EfXlvjFe/destdir/tmp/pkgtasks.test4.EfXlvjFe/file1
+ok 4 - missing file with PKG_DESTDIR
+> permissions set: /tmp/pkgtasks.test5.Hr1zfpKN/destdir/tmp/pkgtasks.test5.Hr1zfpKN/file1 (m=0444)
+ok 5 - change only file mode with PKG_DESTDIR
+ok 6 # skip change to root/wheel with PKG_DESTDIR (requires root)
+# skipped 2 test(s)
+# passed all 6 test(s)
+*** t_platform.sh ***
+1..2
+ok 1 - uname with dashes and slashes
+ok 2 - cygwin
+# passed all 2 test(s)
+*** t_postinstall.sh ***
+1..13
+> files
+> permissions
+> shells
+ok 1 - dirs fail
+! files
+> permissions
+> shells
+ok 2 - files fail
+> files
+> permissions
+> shells
+ok 3 - fonts fail
+> files
+> permissions
+> shells
+ok 4 - function fail
+> files
+> permissions
+> shells
+ok 5 - icon_themes fail
+> files
+> permissions
+> shells
+ok 6 - info_files fail
+> files
+> permissions
+> shells
+ok 7 - ocaml_findlib fail
+> files
+! permissions
+> shells
+ok 8 - permissions fail
+> files
+> permissions
+! shells
+ok 9 - shells fail
+> files
+> permissions
+> shells
+ok 10 - shlibs fail
+> files
+> permissions
+> shells
+ok 11 - all succeed
+ok 12 - ${TASK_VERBOSE} = none
+> files
+> permissions
+> shlibs
+> fonts
+> icon_themes
+> shells
+> info_files
+> ocaml_findlib
+> function
+ok 13 - ${TASK_VERBOSE} = all
+# passed all 13 test(s)
+*** t_postremove.sh ***
+1..14
+> shells
+! directories
+> users
+> groups
+ok 1 - dirs fail
+> shells
+> directories
+> users
+> groups
+ok 2 - files fail
+> shells
+> directories
+> users
+> groups
+ok 3 - fonts fail
+> shells
+> directories
+> users
+> groups
+ok 4 - function fail
+> shells
+> directories
+> users
+! groups
+ok 5 - groups fail
+> shells
+> directories
+> users
+> groups
+ok 6 - icon_themes fail
+> shells
+> directories
+> users
+> groups
+ok 7 - info_files fail
+> shells
+> directories
+> users
+> groups
+ok 8 - ocaml_findlib fail
+! shells
+> directories
+> users
+> groups
+ok 9 - shells fail
+> shells
+> directories
+> users
+> groups
+ok 10 - shlibs fail
+> shells
+> directories
+! users
+> groups
+ok 11 - users fail
+> shells
+> directories
+> users
+> groups
+ok 12 - all succeed
+ok 13 - ${TASK_VERBOSE} = none
+> shells
+> fonts
+> icon_themes
+> shlibs
+> ocaml_findlib
+> directories
+> users
+> groups
+> function
+ok 14 - ${TASK_VERBOSE} = all
+# passed all 14 test(s)
+*** t_preinstall.sh ***
+1..7
+> groups
+> users
+! directories
+> function
+ok 1 - dirs fail
+> groups
+> users
+> directories
+! function
+ok 2 - function fail
+! groups
+ok 3 - groups fail
+> groups
+! users
+ok 4 - users fail
+> groups
+> users
+> directories
+> function
+ok 5 - all succeed
+ok 6 - ${TASK_VERBOSE} = none
+> groups
+> users
+> directories
+> function
+ok 7 - ${TASK_VERBOSE} = all
+# passed all 7 test(s)
+*** t_preremove.sh ***
+1..7
+! files
+> function
+ok 1 - files fail
+> files
+! function
+ok 2 - function fail
+> files
+> function
+ok 3 - icon_themes fail
+> files
+> function
+ok 4 - info_files fail
+> files
+> function
+ok 5 - all succeed
+ok 6 - ${TASK_VERBOSE} = none
+> info_files
+> icon_themes
+> files
+> function
+ok 7 - ${TASK_VERBOSE} = all
+# passed all 7 test(s)
+*** t_quote.sh ***
+1..6
+ok 1 - 6 words
+ok 2 - 1 word
+ok 3 - 3 words (correct quoting)
+ok 4 - 3 words, extraneous quotes (correct quoting)
+*
+ok 5 - 1 word (correct quoting)
+*
+ok 6 - 1 word, extraneous quotes (correct quoting)
+# passed all 6 test(s)
+*** t_random.sh ***
+1..2
+ok 1 - each $RANDOM is different
+ok 2 - task_random -i yields reproducible $RANDOM
+# passed all 2 test(s)
+*** t_refcount.sh ***
+1..18
+ok 1 - add nonexistent file
+ok 2 - put permissions
+ok 3 - put preexist
+ok 4 - remove after add twice
+ok 5 - remove pkg1 after add pkg1 and pkg2
+ok 6 - put property with no refcount
+ok 7 - delete refcount
+ok 8 - remove refcount after putting property
+ok 9 - delete property
+ok 10 - add nonexistent file with PKG_DESTDIR
+ok 11 - put permissions with PKG_DESTDIR
+ok 12 - put preexist with DESTDIR
+ok 13 - remove after add twice with PKG_DESTDIR
+ok 14 - remove pkg1 after add pkg1 and pkg2 with PKG_DESTDIR
+ok 15 - put property with no refcount with PKG_DESTDIR
+ok 16 - delete refcount with PKG_DESTDIR
+ok 17 - remove refcount after putting property with PKG_DESTDIR
+ok 18 - delete property with PKG_DESTDIR
+# passed all 18 test(s)
+*** t_shells.sh ***
+1..15
+!!! INFO: run_tests.sh: Add shell "/tmp/pkgtasks.test1.gF4T1pEZ/bin/pdksh" to /tmp/pkgtasks.test1.gF4T1pEZ/etc/shells.
+!!! INFO: run_tests.sh: Add shell "/tmp/pkgtasks.test1.gF4T1pEZ/bin/bash" to /tmp/pkgtasks.test1.gF4T1pEZ/etc/shells.
+!!! INFO: run_tests.sh: Add shell "/tmp/pkgtasks.test1.gF4T1pEZ/bin/pdksh" to /tmp/pkgtasks.test1.gF4T1pEZ/etc/shells.
+ok 1 - check-add shells with empty shell database
+> shell added: /tmp/pkgtasks.test2.dHii9w4K/bin/pdksh
+> shell added: /tmp/pkgtasks.test2.dHii9w4K/bin/bash
+! shell already added: /tmp/pkgtasks.test2.dHii9w4K/bin/pdksh
+ok 2 - add shells
+> shell added: /tmp/pkgtasks.test3.4vTL38oK/bin/pdksh
+> shell added: /tmp/pkgtasks.test3.4vTL38oK/bin/bash
+! shell already added: /tmp/pkgtasks.test3.4vTL38oK/bin/pdksh
+ok 3 - verify uniqueness
+> shell added: /tmp/pkgtasks.test4.42L1mpzz/bin/pdksh
+> shell added: /tmp/pkgtasks.test4.42L1mpzz/bin/bash
+! shell already added: /tmp/pkgtasks.test4.42L1mpzz/bin/pdksh
+ok 4 - check-add shells with all shells added
+> shell added: /tmp/pkgtasks.test5.DOCekekj/bin/pdksh
+> shell added: /tmp/pkgtasks.test5.DOCekekj/bin/bash
+! shell already added: /tmp/pkgtasks.test5.DOCekekj/bin/pdksh
+!!! INFO: run_tests.sh: Remove shell "/tmp/pkgtasks.test5.DOCekekj/bin/pdksh" from /tmp/pkgtasks.test5.DOCekekj/etc/shells.
+!!! INFO: run_tests.sh: Remove shell "/tmp/pkgtasks.test5.DOCekekj/bin/bash" from /tmp/pkgtasks.test5.DOCekekj/etc/shells.
+!!! INFO: run_tests.sh: Remove shell "/tmp/pkgtasks.test5.DOCekekj/bin/pdksh" from /tmp/pkgtasks.test5.DOCekekj/etc/shells.
+ok 5 - check-remove shells with no shells removed
+> shell added: /tmp/pkgtasks.test6.pxHx9FDO/bin/pdksh
+> shell added: /tmp/pkgtasks.test6.pxHx9FDO/bin/bash
+! shell already added: /tmp/pkgtasks.test6.pxHx9FDO/bin/pdksh
+> shell removed: /tmp/pkgtasks.test6.pxHx9FDO/bin/pdksh
+> shell removed: /tmp/pkgtasks.test6.pxHx9FDO/bin/bash
+! shell already removed: /tmp/pkgtasks.test6.pxHx9FDO/bin/pdksh
+ok 6 - remove shells
+> shell added: /tmp/pkgtasks.test7.5KHmaXHm/bin/pdksh
+> shell added: /tmp/pkgtasks.test7.5KHmaXHm/bin/bash
+! shell already added: /tmp/pkgtasks.test7.5KHmaXHm/bin/pdksh
+> shell removed: /tmp/pkgtasks.test7.5KHmaXHm/bin/pdksh
+> shell removed: /tmp/pkgtasks.test7.5KHmaXHm/bin/bash
+! shell already removed: /tmp/pkgtasks.test7.5KHmaXHm/bin/pdksh
+ok 7 - verify empty shell database
+ok 8 - check-remove shells with empty shell database
+> shell added: /tmp/pkgtasks.test9.89wHnocY/bin/pdksh
+> shell added: /tmp/pkgtasks.test9.89wHnocY/bin/bash
+! shell already added: /tmp/pkgtasks.test9.89wHnocY/bin/pdksh
+ok 9 - add shells with PKG_DESTDIR
+> shell added: /tmp/pkgtasks.test10.440Hoxf5/bin/pdksh
+> shell added: /tmp/pkgtasks.test10.440Hoxf5/bin/bash
+! shell already added: /tmp/pkgtasks.test10.440Hoxf5/bin/pdksh
+ok 10 - verify uniqueness with PKG_DESTDIR
+> shell added: /tmp/pkgtasks.test11.nJsWya8u/bin/pdksh
+> shell added: /tmp/pkgtasks.test11.nJsWya8u/bin/bash
+! shell already added: /tmp/pkgtasks.test11.nJsWya8u/bin/pdksh
+ok 11 - check-add shells with all shells added with PKG_DESTDIR
+> shell added: /tmp/pkgtasks.test12.ZAzPTSg7/bin/pdksh
+> shell added: /tmp/pkgtasks.test12.ZAzPTSg7/bin/bash
+! shell already added: /tmp/pkgtasks.test12.ZAzPTSg7/bin/pdksh
+!!! INFO: run_tests.sh: Remove shell "/tmp/pkgtasks.test12.ZAzPTSg7/bin/pdksh" from /tmp/pkgtasks.test12.ZAzPTSg7/destdir/tmp/pkgtasks.test12.ZAzPTSg7/etc/shells.
+!!! INFO: run_tests.sh: Remove shell "/tmp/pkgtasks.test12.ZAzPTSg7/bin/bash" from /tmp/pkgtasks.test12.ZAzPTSg7/destdir/tmp/pkgtasks.test12.ZAzPTSg7/etc/shells.
+!!! INFO: run_tests.sh: Remove shell "/tmp/pkgtasks.test12.ZAzPTSg7/bin/pdksh" from /tmp/pkgtasks.test12.ZAzPTSg7/destdir/tmp/pkgtasks.test12.ZAzPTSg7/etc/shells.
+ok 12 - check-remove shells with no shells removed with PKG_DESTDIR
+> shell added: /tmp/pkgtasks.test13.uCVqeZhM/bin/pdksh
+> shell added: /tmp/pkgtasks.test13.uCVqeZhM/bin/bash
+! shell already added: /tmp/pkgtasks.test13.uCVqeZhM/bin/pdksh
+> shell removed: /tmp/pkgtasks.test13.uCVqeZhM/bin/pdksh
+> shell removed: /tmp/pkgtasks.test13.uCVqeZhM/bin/bash
+! shell already removed: /tmp/pkgtasks.test13.uCVqeZhM/bin/pdksh
+ok 13 - remove shells with PKG_DESTDIR
+> shell added: /tmp/pkgtasks.test14.osYCPiC1/bin/pdksh
+> shell added: /tmp/pkgtasks.test14.osYCPiC1/bin/bash
+! shell already added: /tmp/pkgtasks.test14.osYCPiC1/bin/pdksh
+> shell removed: /tmp/pkgtasks.test14.osYCPiC1/bin/pdksh
+> shell removed: /tmp/pkgtasks.test14.osYCPiC1/bin/bash
+! shell already removed: /tmp/pkgtasks.test14.osYCPiC1/bin/pdksh
+ok 14 - verify empty shell database
+ok 15 - check-remove shells with empty shell database
+# passed all 15 test(s)
+*** t_shlibs.sh ***
+1..2
+> shared library cache rebuilt
+ok 1 - add with empty cache
+> shared library cache rebuilt
+> shared library cache rebuilt
+ok 2 - remove after adding to cache
+# passed all 2 test(s)
+*** t_sort.sh ***
+1..5
+ok 1 - sort
+ok 2 - reverse sort
+ok 3 - empty input
+ok 4 - unique sort
+ok 5 - unique reverse-sort
+# passed all 5 test(s)
+*** t_taskfunc.sh ***
+1..6
+ok 1 - missing function
+ok 2 - add
+ok 3 - remove
+ok 4 - add fail
+ok 5 - wrong stage
+ok 6 - correct stage
+# passed all 6 test(s)
+*** t_tee.sh ***
+1..4
+ok 1 - no files
+ok 2 - output files
+ok 3 - overwrite existing files
+ok 4 - append existing files
+# passed all 4 test(s)
+*** t_truthy.sh ***
+1..6
+ok 1 - task_is_truthy yes
+ok 2 - task_is_truthy true
+ok 3 - task_is_truthy on
+ok 4 - task_is_truthy 1
+ok 5 - task_is_truthy case-insensitive
+ok 6 - task_is_truthy no
+# passed all 6 test(s)
+*** t_usergroup.sh ***
+1..12
+ok 1 - nonexistent group, no groupid
+ok 2 - nonexistent group, nonexistent groupid
+ok 3 - nonexistent group, existent groupid
+ok 4 - existent group, no groupid
+ok 5 - existent group, nonexistent groupid
+ok 6 - existent group, existent groupid
+ok 7 - nonexistent user, no userid
+ok 8 - nonexistent user, nonexistent userid
+ok 9 - nonexistent user, existent userid
+ok 10 - existent user, no userid
+ok 11 - existent user, nonexistent userid
+ok 12 - existent user, existent userid
+# passed all 12 test(s)
+*** t_usergroup_FreeBSD.sh ***
+1..12
+ok 1 - nonexistent group, no groupid
+ok 2 - nonexistent group, nonexistent groupid
+ok 3 - nonexistent group, existent groupid
+ok 4 - existent group, no groupid
+ok 5 - existent group, nonexistent groupid
+ok 6 - existent group, existent groupid
+ok 7 - nonexistent user, no userid
+ok 8 - nonexistent user, nonexistent userid
+ok 9 - nonexistent user, existent userid
+ok 10 - existent user, no userid
+ok 11 - existent user, nonexistent userid
+ok 12 - existent user, existent userid
+# passed all 12 test(s)
+*** t_usergroup_Linux.sh ***
+1..12
+ok 1 - nonexistent group, no groupid
+ok 2 - nonexistent group, nonexistent groupid
+ok 3 - nonexistent group, existent groupid
+ok 4 - existent group, no groupid
+ok 5 - existent group, nonexistent groupid
+ok 6 - existent group, existent groupid
+ok 7 - nonexistent user, no userid
+ok 8 - nonexistent user, nonexistent userid
+ok 9 - nonexistent user, existent userid
+ok 10 - existent user, no userid
+ok 11 - existent user, nonexistent userid
+ok 12 - existent user, existent userid
+# passed all 12 test(s)
+*** t_usergroup_MirBSD.sh ***
+1..15
+ok 1 - nonexistent group, no groupid
+ok 2 - nonexistent group, nonexistent groupid
+ok 3 - nonexistent group, existent groupid
+ok 4 - existent group, no groupid
+ok 5 - existent group, nonexistent groupid
+ok 6 - existent group, existent groupid
+ok 7 - broken chown(8) when adding group
+ok 8 - nonexistent user, no userid
+ok 9 - nonexistent user, nonexistent userid
+ok 10 - nonexistent user, existent userid
+ok 11 - existent user, no userid
+ok 12 - existent user, nonexistent userid
+ok 13 - existent user, existent userid
+ok 14 - broken chown(8) when adding user
+ok 15 - broken pwd_mkdb(8) when adding user
+# passed all 15 test(s)
+*** t_usergroup_NetBSD.sh ***
+1..12
+ok 1 - nonexistent group, no groupid
+ok 2 - nonexistent group, nonexistent groupid
+ok 3 - nonexistent group, existent groupid
+ok 4 - existent group, no groupid
+ok 5 - existent group, nonexistent groupid
+ok 6 - existent group, existent groupid
+ok 7 - nonexistent user, no userid
+ok 8 - nonexistent user, nonexistent userid
+ok 9 - nonexistent user, existent userid
+ok 10 - existent user, no userid
+ok 11 - existent user, nonexistent userid
+ok 12 - existent user, existent userid
+# passed all 12 test(s)
+*** t_usergroup_exists.sh ***
+1..12
+ok 1 # skip nonexistent group, no groupid (requires root)
+ok 2 # skip nonexistent group, nonexistent groupid (requires root)
+ok 3 # skip nonexistent group, existent groupid (requires root)
+ok 4 # skip existent group, no groupid (requires root)
+ok 5 # skip existent group, nonexistent groupid (requires root)
+ok 6 # skip existent group, existent groupid (requires root)
+ok 7 # skip nonexistent user, no userid (requires root)
+ok 8 # skip nonexistent user, nonexistent userid (requires root)
+ok 9 # skip nonexistent user, existent userid (requires root)
+ok 10 # skip existent user, no userid (requires root)
+ok 11 # skip existent user, nonexistent userid (requires root)
+ok 12 # skip existent user, existent userid (requires root)
+# skipped 12 test(s)
+# passed all 12 test(s)
+*** t_usergroup_mock.sh ***
+1..26
+ok 1 - exists: nonexistent group, no groupid
+ok 2 - exists: nonexistent group, nonexistent groupid
+ok 3 - exists: nonexistent group, existent groupid
+ok 4 - exists: existent group, no groupid
+ok 5 - exists: existent group, nonexistent groupid
+ok 6 - exists: existent group, existent groupid
+ok 7 - exists: existent group, matching groupid
+ok 8 - exists: nonexistent user, no userid
+ok 9 - exists: nonexistent user, nonexistent userid
+ok 10 - exists: nonexistent user, existent userid
+ok 11 - exists: existent user, no userid
+ok 12 - exists: existent user, nonexistent userid
+ok 13 - exists: existent user, existent userid
+ok 14 - exists: existent user, matching userid
+ok 15 - add: nonexistent group, no groupid
+ok 16 - add: nonexistent group, nonexistent groupid
+ok 17 - add: nonexistent group, existent groupid
+ok 18 - add: existent group, no groupid
+ok 19 - add: existent group, nonexistent groupid
+ok 20 - add: existent group, existent groupid
+ok 21 - add: nonexistent user, no userid
+ok 22 - add: nonexistent user, nonexistent userid
+ok 23 - add: nonexistent user, existent userid
+ok 24 - add: existent user, no userid
+ok 25 - add: existent user, nonexistent userid
+ok 26 - add: existent user, existent userid
+# passed all 26 test(s)
+*** t_users.sh ***
+1..9
+!!! INFO: run_tests.sh: Create user: userD (group = groupD)
+!!! INFO: run_tests.sh: Create user: userE (uid = 200, group = groupE)
+!!! INFO: run_tests.sh: Create user: userF (uid = 205, group = groupF)
+ok 1 - check-add missing users
+> user created: userD (group = groupD)
+> user created: userE (uid = 200, group = groupE)
+> user created: userF (uid = 205, group = groupF)
+ok 2 - add nonexistent users
+> user created: userD (group = groupD)
+! user already exists: userE
+> user created: userF (uid = 205, group = groupF)
+ok 3 - add existent and nonexistent users
+> user created: userD (group = groupD)
+! user conflict: userE (uid = 200, group = groupE)
+ok 4 - add conflicting user
+> user created: userD (group = groupD)
+> user created: userE (uid = 200, group = groupE)
+> user created: userF (uid = 205, group = groupF)
+ok 5 - check-add users with all users added
+> user created: userD (group = groupD)
+> user created: userE (uid = 200, group = groupE)
+> user created: userF (uid = 205, group = groupF)
+!!! INFO: run_tests.sh: Remove user if unused: userD
+!!! INFO: run_tests.sh: Remove user if unused: userE
+!!! INFO: run_tests.sh: Remove user if unused: userF
+ok 6 - check-remove users with no users removed
+> user created: userD (group = groupD)
+> user created: userE (uid = 200, group = groupE)
+> user created: userF (uid = 205, group = groupF)
+ok 7 - remove existent users
+ok 8 - remove nonexistent users
+ok 9 - check-remove users with users already removed
+# passed all 9 test(s)
+*** t_valid_options.sh ***
+1..9
+ok 1 - valid substring
+ok 2 - valid first character
+ok 3 - valid middle character
+ok 4 - valid last character
+ok 5 - invalid substring
+ok 6 - invalid first character
+ok 7 - invalid middle character
+ok 8 - invalid last character
+ok 9 - invalid only
+# passed all 9 test(s)
+*** t_version.sh ***
+1..46
+> compare "1" vs. "1+1"
+  > compare: "1" vs. "1"
+    > equal
+  > compare: "" vs. "1"
+    > less than
+ok 1 - 1 < 1+1
+> compare "1.0" vs. "1.0.1"
+  > compare: "1.0" vs. "1.0.1"
+    > ". (500) /  | 1.0" vs. ". (500) /  | 1.0.1"
+    > " (400) /  | 1.0" vs. " (400) /  | 1.0.1"
+    > "1 | .0" vs. "1 | .0.1"
+    > ". (500) /  | 0" vs. ". (500) /  | 0.1"
+    > " (400) /  | 0" vs. " (400) /  | 0.1"
+    > "0 | " vs. "0 | .1"
+    > " (400) /  | " vs. ". (500) /  | 1"
+    > less than
+ok 2 - 1.0 < 1.0.1
+> compare "1.23.2" vs. "1.23.11"
+  > compare: "1.23.2" vs. "1.23.11"
+    > ". (500) /  | 1.23.2" vs. ". (500) /  | 1.23.11"
+    > " (400) /  | 1.23.2" vs. " (400) /  | 1.23.11"
+    > "1 | .23.2" vs. "1 | .23.11"
+    > ". (500) /  | 23.2" vs. ". (500) /  | 23.11"
+    > " (400) /  | 23.2" vs. " (400) /  | 23.11"
+    > "23 | .2" vs. "23 | .11"
+    > ". (500) /  | 2" vs. ". (500) /  | 11"
+    > " (400) /  | 2" vs. " (400) /  | 11"
+    > "2 | " vs. "11 | "
+    > less than
+ok 3 - 1.23.2 < 1.23.11
+> compare "1.2alpha" vs. "1.2"
+  > compare: "1.2alpha" vs. "1.2"
+    > ". (500) /  | 1.2alpha" vs. ". (500) /  | 1.2"
+    > " (400) /  | 1.2alpha" vs. " (400) /  | 1.2"
+    > "1 | .2alpha" vs. "1 | .2"
+    > ". (500) /  | 2alpha" vs. ". (500) /  | 2"
+    > " (400) /  | 2alpha" vs. " (400) /  | 2"
+    > "2 | alpha" vs. "2 | "
+    > "~alpha (100) /  | " vs. " (400) /  | "
+    > less than
+ok 4 - 1.2alpha < 1.2
+> compare "1.2alpha" vs. "1.2alpha1"
+  > compare: "1.2alpha" vs. "1.2alpha1"
+    > ". (500) /  | 1.2alpha" vs. ". (500) /  | 1.2alpha1"
+    > " (400) /  | 1.2alpha" vs. " (400) /  | 1.2alpha1"
+    > "1 | .2alpha" vs. "1 | .2alpha1"
+    > ". (500) /  | 2alpha" vs. ". (500) /  | 2alpha1"
+    > " (400) /  | 2alpha" vs. " (400) /  | 2alpha1"
+    > "2 | alpha" vs. "2 | alpha1"
+    > "~alpha (100) /  | " vs. "~alpha (100) /  | 1"
+    > " (400) /  | " vs. " (400) /  | 1"
+    > " | " vs. "1 | "
+    > less than
+ok 5 - 1.2alpha < 1.2alpha1
+> compare "1.2alpha2" vs. "1.2alpha11"
+  > compare: "1.2alpha2" vs. "1.2alpha11"
+    > ". (500) /  | 1.2alpha2" vs. ". (500) /  | 1.2alpha11"
+    > " (400) /  | 1.2alpha2" vs. " (400) /  | 1.2alpha11"
+    > "1 | .2alpha2" vs. "1 | .2alpha11"
+    > ". (500) /  | 2alpha2" vs. ". (500) /  | 2alpha11"
+    > " (400) /  | 2alpha2" vs. " (400) /  | 2alpha11"
+    > "2 | alpha2" vs. "2 | alpha11"
+    > "~alpha (100) /  | 2" vs. "~alpha (100) /  | 11"
+    > " (400) /  | 2" vs. " (400) /  | 11"
+    > "2 | " vs. "11 | "
+    > less than
+ok 6 - 1.2alpha2 < 1.2alpha11
+> compare "1.2alpha" vs. "1.2beta"
+  > compare: "1.2alpha" vs. "1.2beta"
+    > ". (500) /  | 1.2alpha" vs. ". (500) /  | 1.2beta"
+    > " (400) /  | 1.2alpha" vs. " (400) /  | 1.2beta"
+    > "1 | .2alpha" vs. "1 | .2beta"
+    > ". (500) /  | 2alpha" vs. ". (500) /  | 2beta"
+    > " (400) /  | 2alpha" vs. " (400) /  | 2beta"
+    > "2 | alpha" vs. "2 | beta"
+    > "~alpha (100) /  | " vs. "~beta (100) /  | "
+    > less than
+ok 7 - 1.2alpha < 1.2beta
+> compare "1.2alpha" vs. "1.2rc"
+  > compare: "1.2alpha" vs. "1.2rc"
+    > ". (500) /  | 1.2alpha" vs. ". (500) /  | 1.2rc"
+    > " (400) /  | 1.2alpha" vs. " (400) /  | 1.2rc"
+    > "1 | .2alpha" vs. "1 | .2rc"
+    > ". (500) /  | 2alpha" vs. ". (500) /  | 2rc"
+    > " (400) /  | 2alpha" vs. " (400) /  | 2rc"
+    > "2 | alpha" vs. "2 | rc"
+    > "~alpha (100) /  | " vs. "~rc (100) /  | "
+    > less than
+ok 8 - 1.2alpha < 1.2rc
+> compare "1.2beta" vs. "1.2rc"
+  > compare: "1.2beta" vs. "1.2rc"
+    > ". (500) /  | 1.2beta" vs. ". (500) /  | 1.2rc"
+    > " (400) /  | 1.2beta" vs. " (400) /  | 1.2rc"
+    > "1 | .2beta" vs. "1 | .2rc"
+    > ". (500) /  | 2beta" vs. ". (500) /  | 2rc"
+    > " (400) /  | 2beta" vs. " (400) /  | 2rc"
+    > "2 | beta" vs. "2 | rc"
+    > "~beta (100) /  | " vs. "~rc (100) /  | "
+    > less than
+ok 9 - 1.2beta < 1.2rc
+> compare "1.2alpha" vs. "1.2e"
+  > compare: "1.2alpha" vs. "1.2e"
+    > ". (500) /  | 1.2alpha" vs. ". (500) /  | 1.2e"
+    > " (400) /  | 1.2alpha" vs. " (400) /  | 1.2e"
+    > "1 | .2alpha" vs. "1 | .2e"
+    > ". (500) /  | 2alpha" vs. ". (500) /  | 2e"
+    > " (400) /  | 2alpha" vs. " (400) /  | 2e"
+    > "2 | alpha" vs. "2 | e"
+    > less than
+ok 10 - 1.2alpha < 1.2e
+> compare "1.2a" vs. "1.2b"
+  > compare: "1.2a" vs. "1.2b"
+    > ". (500) /  | 1.2a" vs. ". (500) /  | 1.2b"
+    > " (400) /  | 1.2a" vs. " (400) /  | 1.2b"
+    > "1 | .2a" vs. "1 | .2b"
+    > ". (500) /  | 2a" vs. ". (500) /  | 2b"
+    > " (400) /  | 2a" vs. " (400) /  | 2b"
+    > "2 | a" vs. "2 | b"
+    > ". (500) /  | 1" vs. ". (500) /  | 2"
+    > " (400) /  | 1" vs. " (400) /  | 2"
+    > "1 | " vs. "2 | "
+    > less than
+ok 11 - 1.2a < 1.2b
+> compare "1.2a2" vs. "1.2a11"
+  > compare: "1.2a2" vs. "1.2a11"
+    > ". (500) /  | 1.2a2" vs. ". (500) /  | 1.2a11"
+    > " (400) /  | 1.2a2" vs. " (400) /  | 1.2a11"
+    > "1 | .2a2" vs. "1 | .2a11"
+    > ". (500) /  | 2a2" vs. ". (500) /  | 2a11"
+    > " (400) /  | 2a2" vs. " (400) /  | 2a11"
+    > "2 | a2" vs. "2 | a11"
+    > ". (500) /  | 1.2" vs. ". (500) /  | 1.11"
+    > " (400) /  | 1.2" vs. " (400) /  | 1.11"
+    > "1 | .2" vs. "1 | .11"
+    > ". (500) /  | 2" vs. ". (500) /  | 11"
+    > " (400) /  | 2" vs. " (400) /  | 11"
+    > "2 | " vs. "11 | "
+    > less than
+ok 12 - 1.2a2 < 1.2a11
+> compare "1.2rc1" vs. "1.2a"
+  > compare: "1.2rc1" vs. "1.2a"
+    > ". (500) /  | 1.2rc1" vs. ". (500) /  | 1.2a"
+    > " (400) /  | 1.2rc1" vs. " (400) /  | 1.2a"
+    > "1 | .2rc1" vs. "1 | .2a"
+    > ". (500) /  | 2rc1" vs. ". (500) /  | 2a"
+    > " (400) /  | 2rc1" vs. " (400) /  | 2a"
+    > "2 | rc1" vs. "2 | a"
+    > less than
+ok 13 - 1.2rc1 < 1.2a
+> compare "1.2" vs. "1.2+1"
+  > compare: "1.2" vs. "1.2"
+    > equal
+  > compare: "" vs. "1"
+    > less than
+ok 14 - 1.2 < 1.2+1
+> compare "1.2alpha99" vs. "1.2+1"
+  > compare: "1.2alpha99" vs. "1.2"
+    > ". (500) /  | 1.2alpha99" vs. ". (500) /  | 1.2"
+    > " (400) /  | 1.2alpha99" vs. " (400) /  | 1.2"
+    > "1 | .2alpha99" vs. "1 | .2"
+    > ". (500) /  | 2alpha99" vs. ". (500) /  | 2"
+    > " (400) /  | 2alpha99" vs. " (400) /  | 2"
+    > "2 | alpha99" vs. "2 | "
+    > "~alpha (100) /  | 99" vs. " (400) /  | "
+    > less than
+ok 15 - 1.2alpha99 < 1.2+1
+> compare "1.2+2" vs. "1.2+11"
+  > compare: "1.2" vs. "1.2"
+    > equal
+  > compare: "2" vs. "11"
+    > ". (500) /  | 2" vs. ". (500) /  | 11"
+    > " (400) /  | 2" vs. " (400) /  | 11"
+    > "2 | " vs. "11 | "
+    > less than
+ok 16 - 1.2+2 < 1.2+11
+> compare "" vs. "1.0"
+  > compare: "" vs. "1.0"
+    > less than
+ok 17 - (null) < 1.0
+> compare "1.2.5" vs. "1.2e"
+  > compare: "1.2.5" vs. "1.2e"
+    > ". (500) /  | 1.2.5" vs. ". (500) /  | 1.2e"
+    > " (400) /  | 1.2.5" vs. " (400) /  | 1.2e"
+    > "1 | .2.5" vs. "1 | .2e"
+    > ". (500) /  | 2.5" vs. ". (500) /  | 2e"
+    > " (400) /  | 2.5" vs. " (400) /  | 2e"
+    > "2 | .5" vs. "2 | e"
+    > ". (500) /  | 5" vs. ". (500) /  | 5"
+    > " (400) /  | 5" vs. " (400) /  | 5"
+    > "5 | " vs. "5 | "
+    > " (400) /  | " vs. " (400) /  | "
+    > " | " vs. " | "
+    > equal
+  > compare: "" vs. ""
+    > equal
+ok 18 - 1.2.5 = 1.2e
+> compare "1.0.0" vs. "1.0.0"
+  > compare: "1.0.0" vs. "1.0.0"
+    > equal
+  > compare: "" vs. ""
+    > equal
+ok 19 - 1.0.0 = 1.0.0
+> compare "1.2.3" vs. "1abc2.3"
+  > compare: "1.2.3" vs. "1abc2.3"
+    > ". (500) /  | 1.2.3" vs. ". (500) /  | 1abc2.3"
+    > " (400) /  | 1.2.3" vs. " (400) /  | 1abc2.3"
+    > "1 | .2.3" vs. "1 | abc2.3"
+    > ". (500) /  | 2.3" vs. "abc (1000) /  | 2.3"
+    > less than
+ok 20 - 1.2.3 < 1abc2.3
+> compare "Bravo" vs. "Charlie"
+  > compare: "Bravo" vs. "Charlie"
+    > "Bravo (1000) /  | " vs. "Charlie (1000) /  | "
+    > less than
+ok 21 - Bravo < Charlie
+> compare "1.2+1" vs. "1.2.1"
+  > compare: "1.2" vs. "1.2.1"
+    > ". (500) /  | 1.2" vs. ". (500) /  | 1.2.1"
+    > " (400) /  | 1.2" vs. " (400) /  | 1.2.1"
+    > "1 | .2" vs. "1 | .2.1"
+    > ". (500) /  | 2" vs. ". (500) /  | 2.1"
+    > " (400) /  | 2" vs. " (400) /  | 2.1"
+    > "2 | " vs. "2 | .1"
+    > " (400) /  | " vs. ". (500) /  | 1"
+    > less than
+ok 22 - 1.2+1 < 1.2.1
+> compare "1_2_0" vs. "1.2.0"
+  > compare: "1_2_0" vs. "1.2.0"
+    > ". (500) /  | 1_2_0" vs. ". (500) /  | 1.2.0"
+    > " (400) /  | 1_2_0" vs. " (400) /  | 1.2.0"
+    > "1 | _2_0" vs. "1 | .2.0"
+    > "_ (500) /  | 2_0" vs. ". (500) /  | 2.0"
+    > " (400) /  | 2_0" vs. " (400) /  | 2.0"
+    > "2 | _0" vs. "2 | .0"
+    > "_ (500) /  | 0" vs. ". (500) /  | 0"
+    > " (400) /  | 0" vs. " (400) /  | 0"
+    > "0 | " vs. "0 | "
+    > " (400) /  | " vs. " (400) /  | "
+    > " | " vs. " | "
+    > equal
+  > compare: "" vs. ""
+    > equal
+ok 23 - 1_2_0 = 1.2.0
+> compare "1.2alpha" vs. "1.2alpha+1"
+  > compare: "1.2alpha" vs. "1.2alpha"
+    > equal
+  > compare: "" vs. "1"
+    > less than
+ok 24 - 1.2alpha < 1.2alpha+1
+> compare "1.2~" vs. "1.2"
+  > compare: "1.2~" vs. "1.2"
+    > ". (500) /  | 1.2~" vs. ". (500) /  | 1.2"
+    > " (400) /  | 1.2~" vs. " (400) /  | 1.2"
+    > "1 | .2~" vs. "1 | .2"
+    > ". (500) /  | 2~" vs. ". (500) /  | 2"
+    > " (400) /  | 2~" vs. " (400) /  | 2"
+    > "2 | ~" vs. "2 | "
+    > "~ (100) /  | " vs. " (400) /  | "
+    > less than
+ok 25 - 1.2~ < 1.2
+> compare "1.2~alpha1" vs. "1.2alpha1"
+  > compare: "1.2~alpha1" vs. "1.2alpha1"
+    > ". (500) /  | 1.2~alpha1" vs. ". (500) /  | 1.2alpha1"
+    > " (400) /  | 1.2~alpha1" vs. " (400) /  | 1.2alpha1"
+    > "1 | .2~alpha1" vs. "1 | .2alpha1"
+    > ". (500) /  | 2~alpha1" vs. ". (500) /  | 2alpha1"
+    > " (400) /  | 2~alpha1" vs. " (400) /  | 2alpha1"
+    > "2 | ~alpha1" vs. "2 | alpha1"
+    > "~alpha (100) /  | 1" vs. "~alpha (100) /  | 1"
+    > " (400) /  | 1" vs. " (400) /  | 1"
+    > "1 | " vs. "1 | "
+    > " (400) /  | " vs. " (400) /  | "
+    > " | " vs. " | "
+    > equal
+  > compare: "" vs. ""
+    > equal
+ok 26 - 1.2~alpha1 = 1.2alpha1
+> compare "1.2~a1" vs. "1.2alpha1"
+  > compare: "1.2~a1" vs. "1.2alpha1"
+    > ". (500) /  | 1.2~a1" vs. ". (500) /  | 1.2alpha1"
+    > " (400) /  | 1.2~a1" vs. " (400) /  | 1.2alpha1"
+    > "1 | .2~a1" vs. "1 | .2alpha1"
+    > ". (500) /  | 2~a1" vs. ". (500) /  | 2alpha1"
+    > " (400) /  | 2~a1" vs. " (400) /  | 2alpha1"
+    > "2 | ~a1" vs. "2 | alpha1"
+    > "~a (100) /  | 1" vs. "~alpha (100) /  | 1"
+    > less than
+ok 27 - 1.2~a1 < 1.2alpha1
+> compare "1.2~a~b" vs. "1.2~a"
+  > compare: "1.2~a~b" vs. "1.2~a"
+    > ". (500) /  | 1.2~a~b" vs. ". (500) /  | 1.2~a"
+    > " (400) /  | 1.2~a~b" vs. " (400) /  | 1.2~a"
+    > "1 | .2~a~b" vs. "1 | .2~a"
+    > ". (500) /  | 2~a~b" vs. ". (500) /  | 2~a"
+    > " (400) /  | 2~a~b" vs. " (400) /  | 2~a"
+    > "2 | ~a~b" vs. "2 | ~a"
+    > "~a (100) / ~b | " vs. "~a (100) /  | "
+    > "~b (100) /  | " vs. " (400) /  | "
+    > less than
+ok 28 - 1.2~a~b < 1.2~a
+> compare "1.2alpha1" vs. "1.2~b1"
+  > compare: "1.2alpha1" vs. "1.2~b1"
+    > ". (500) /  | 1.2alpha1" vs. ". (500) /  | 1.2~b1"
+    > " (400) /  | 1.2alpha1" vs. " (400) /  | 1.2~b1"
+    > "1 | .2alpha1" vs. "1 | .2~b1"
+    > ". (500) /  | 2alpha1" vs. ". (500) /  | 2~b1"
+    > " (400) /  | 2alpha1" vs. " (400) /  | 2~b1"
+    > "2 | alpha1" vs. "2 | ~b1"
+    > "~alpha (100) /  | 1" vs. "~b (100) /  | 1"
+    > less than
+ok 29 - 1.2alpha1 < 1.2~b1
+> compare "~~" vs. "~"
+  > compare: "~~" vs. "~"
+    > "~ (100) / ~ | " vs. "~ (100) /  | "
+    > "~ (100) /  | " vs. " (400) /  | "
+    > less than
+ok 30 - ~~ < ~
+> compare "~" vs. "~a"
+  > compare: "~" vs. "~a"
+    > "~ (100) /  | " vs. "~a (100) /  | "
+    > less than
+ok 31 - ~ < ~a
+ok 32 - version_check 1.2 >= 1.0
+ok 33 - version_check 1.2 >= 2.0 is false
+ok 34 - version_check 1.2 > 1.0
+ok 35 - version_check 1.2 > 2.0 is false
+ok 36 - version_check 1.2 = 1.2
+ok 37 - version_check 1.2 = 2.0 is false
+ok 38 - version_check 1.2 < 2.0
+ok 39 - version_check 1.2 < 1.0 is false
+ok 40 - version_check 1.2 <= 2.0
+ok 41 - version_check 1.2 <= 1.0 is false
+ok 42 - version_check 1.2 *
+ok 43 - version_check 1.2 >= 1.0 < 2.0
+ok 44 - version_check 1.2 >= 1.0 < 1.1 is false
+ok 45 - version_check Charlie < Delta
+ok 46 - version_check Delta > Charlie
+# passed all 46 test(s)
+*** t_which.sh ***
+1..4
+ok 1 - cmd in first directory
+ok 2 - cmd in second directory
+ok 3 - cmd in no directories
+ok 4 - empty cmd
+# passed all 4 test(s)
+# run_tests: passed all 41 test script(s)
